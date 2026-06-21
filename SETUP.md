@@ -54,6 +54,7 @@ TON NFT, которые видны в Tonkeeper/GetGems/TonAPI.
 | # | Что | Где взять |
 |---|-----|-----------|
 | 1 | Скомпилировать контракты | `cd contracts/ton-nft && npx blueprint build` |
+C:\proj\contracts\ton-nft\build\Collection
 | 2 | Скопировать ABI в backend | `cp contracts/ton-nft/build/Collection/Collection_Collection.abi backend/abi/Collection.abi.json` |
 | 3 | Залить `collection.json` (имя/описание/картинка коллекции) в Pinata вручную через сайт | pinata.cloud → Upload → получить URL |
 | 4 | Задеплоить контракт | `npx blueprint run deployCollection --network mainnet` (передать URL из шага 3) |
