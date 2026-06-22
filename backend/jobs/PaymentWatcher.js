@@ -75,7 +75,7 @@ async function checkPayments(prisma) {
                 attributes: [{ trait_type: 'number', value: order.number }],
             };
             const pinned = await pinJson(meta, `number-${order.number}.json`);
-
+            console.log(`Order ${order.id}: Pinata OK →`, pinned.gatewayUrl);
             // ── On-chain mint (admin wallet) ─────────────────────────────────
             const result = await mintNft({
                 ownerAddress: order.walletAddress,

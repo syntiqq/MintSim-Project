@@ -17,7 +17,7 @@ function client() {
             endpoint: isTestnet()
                 ? 'https://testnet.toncenter.com/api/v2/jsonRPC'
                 : 'https://toncenter.com/api/v2/jsonRPC',
-            apiKey: process.env.TONCENTER_API_KEY || process.env.TONAPI_KEY,
+            apiKey: process.env.TONCENTER_API_KEY,
         });
     }
     return _client;
