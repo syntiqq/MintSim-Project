@@ -4,6 +4,9 @@
   "description": "Express + Prisma + Pinata + TON on-chain mint backend",
   "main": "src/index.js",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "prisma db push --accept-data-loss && node src/index.js",
@@ -14,17 +17,16 @@
   },
   "dependencies": {
     "@prisma/client": "^6.17.0",
-    "@ton/core": "^0.63.1",
+    "@ton/core": "^0.59.0",
     "@ton/crypto": "^3.3.0",
-    "@ton/ton": "^16.3.0",
+    "@ton/ton": "^15.1.0",
     "axios": "^1.12.2",
-    "cors": "^2.8.6",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "form-data": "^4.0.0",
     "morgan": "^1.10.0",
     "prisma": "^6.17.0",
-    "sharp": "^0.35.2"
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
