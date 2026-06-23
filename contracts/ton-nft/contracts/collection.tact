@@ -118,4 +118,7 @@ contract Collection with Deployable {
     // convenience (non-standard, handy for the backend & scripts)
     get fun nextItemIndex(): Int   { return self.nextItemIndex; }
     get fun owner(): Address       { return self.owner; }
+    get fun get_nft_content(index: Int, individualContent: Cell): Cell {
+    return individualContent;
+}
 }
