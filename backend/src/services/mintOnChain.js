@@ -93,7 +93,13 @@ async function mintNft({ ownerAddress, metaUri }) {
 
     // Реальная проверка: индекс должен увеличиться. Если нет — Mint
     // не выполнился на стороне Collection (например, неверный опкод).
-    const indexAfter = await getNextItemIndex();
+    let indexAfter = await getNextItemIndex();
+    let checkAttempts = 0;
+    while (indexAfter <= index && checkAttempts < 5) {
+        await new Promise(r => setTimeout(r, 3000));
+        indexAfter = await getNextItemIndex();
+        checkAttempts++;
+    }
     if (indexAfter <= index) {
         throw new Error(`Mint did not take effect on-chain: nextItemIndex still ${indexAfter} (expected > ${index})`);
     }
