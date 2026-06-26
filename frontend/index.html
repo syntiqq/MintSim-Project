@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>MintSim — NFT Minting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/icon.png" type="image/png">
 	<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- TonConnect SDK (если подключаешь в будущем) -->
@@ -95,7 +96,7 @@
 	    margin-left:-15%;
       border-radius: 22px;
       overflow: hidden;
-      background: rgba(114, 26, 255, 0.89); /* фон */
+      background: rgba(35, 23, 54, 0.89); /* фон */
       border: 2px solid var(--border);
       box-shadow: 0 16px 26px rgba(0,0,0,.38);
 	    opacity: .85;
@@ -108,12 +109,31 @@
       filter: drop-shadow(0 2px 8px rgba(0,0,0,.45));
     }
     .mint-number {
-      position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
-      font-weight: 800; letter-spacing: .06em; text-shadow: 0 2px 14px rgba(0,0,0,.45);
-      font-size: 24px;
-      line-height: 1;
-      text-align: center;
+      position: absolute; left: 0; right: 0; bottom: 18px;
+      padding: 0 22px;
+      text-align: left;
+    }
+    .mint-number-prefix {
+      font-weight: 800;
+      letter-spacing: .05em;
+      font-size: 20px;
+      line-height: 1.15;
+      text-shadow: 0 2px 14px rgba(0,0,0,.45);
+    }
+    .mint-number-digits {
+      font-weight: 800;
+      letter-spacing: .05em;
+      font-size: 30px;
+      line-height: 1.15;
       white-space: nowrap;
+      text-shadow: 0 2px 14px rgba(0,0,0,.45);
+    }
+    .mint-number-caption {
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .03em;
+      color: var(--text-dim);
     }
 
     .minted-line { margin-top: 14px; text-align: center; color: var(--text-dim); font-size: 15px; }
@@ -157,8 +177,8 @@
       width: 20px;
       height: 2px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgba(140,110,255,0.35), rgba(255, 255, 255, 0.6));
-      border: 1px solid var(--border);
+      background: rgba(35, 23, 54, 0.89);
+      border: 1px solid rgba(35, 23, 54, 0.89);
       box-shadow: 0 8px 20px rgba(0,0,0,.45);
       display: flex;
       align-items: center;
@@ -227,7 +247,11 @@ padding:10px;
       <section id="page-mint">
         <div class="mint-card">
           <img src="/logo.png" class="mint-logo" />
-          <div class="mint-number">+999 ** *** ***</div>
+          <div class="mint-number">
+            <div class="mint-number-prefix">+999</div>
+            <div class="mint-number-digits" id="mintNumberDigits">** *** ***</div>
+            <div class="mint-number-caption">MSIM Number</div>
+          </div>
         </div>
         <div class="minted-line">
           <span id="mintedCount" data-minted="12345">12345</span> numbers already minted
@@ -272,7 +296,6 @@ padding:10px;
       <div class="dock">
         <img class="logo-mini" src="/logo.png" alt="Mint">
       </div>
-      <span>Mint</span>
     </button>
 
     <a href="#news" class="tab" id="tab-news" onclick="openTab('news')">
@@ -468,7 +491,7 @@ async function mintNumber() {
 
     if (finalOrder.status === 'confirmed') {
       alert(`✅ Your number has been successfully minted +999${finalOrder.number}`);
-      document.querySelector('.mint-number').textContent = `+999${finalOrder.number}`;
+      document.getElementById('mintNumberDigits').textContent = finalOrder.number;
     } else {
       alert('❌ Mint failed: ' + order.orderId + ' — please contact support.');
     }
