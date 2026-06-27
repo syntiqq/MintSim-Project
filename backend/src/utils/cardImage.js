@@ -19,32 +19,39 @@ function getLogoBase64() {
 function buildCardSvg(number) {
     const size = 800;
     const logo = getLogoBase64();
-    const logoSize = size * 0.14;
-    const logoX = size - logoSize - size * 0.035;
-    const logoY = size * 0.035;
-    const fontSize = size * 0.090;
     const formatted = formatPhoneNumber(number);
-    const borderWidth = size * 0.008;
-    const borderColor = 'rgba(255,255,255,0.10)'; // как у тебя на сайте
+
+    // ── Логотип: квадрат сверху-справа, без скругления, cover ──
+    // (как .mint-logo во фронте: width/height 150px на карточке ~430px → ~0.35 от размера)
+    const logoSize = size * 0.35;
+    const logoX = size - logoSize - size * 0.056; // отступ 24px на 430px карточке
+    const logoY = size * 0.056;
+
+    // ── Текст: низ-слева, монослейс, три строки как во фронте ──
+    const textLeft = size * 0.051;       // 22px на 430px карточке
+    const captionSize = size * 0.030;
+    const numberSize  = size * 0.102;    // 44px на 430px карточке
+    const bottomY = size - size * 0.042; // 18px отступ снизу
+
     return `
 <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <clipPath id="logoClip">
-      <circle cx="${logoX + logoSize / 2}" cy="${logoY + logoSize / 2}" r="${logoSize / 2}" />
-    </clipPath>
-  </defs>
-
-  <rect width="${size}" height="${size}" fill="#5a17cc" />
-  <rect width="${size}" height="${size}" fill="#721aff" opacity="0.85" />
+  <!-- фон карточки: rgba(35, 23, 54, 0.89), как в .mint-card -->
+  <rect width="${size}" height="${size}" fill="#231736" fill-opacity="0.89" />
 
   ${logo ? `<image href="${logo}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}"
-         preserveAspectRatio="xMidYMid slice"
-         clip-path="url(#logoClip)" opacity="0.6" />` : ''}
+         preserveAspectRatio="xMidYMid slice" />` : ''}
 
-  <text x="${size / 2 + 2}" y="${size * 0.87 + 2}" font-family="DejaVu Sans, sans-serif" font-weight="800"
-        font-size="${fontSize}" fill="rgba(0,0,0,0.45)" text-anchor="middle" letter-spacing="2">${formatted}</text>
-  <text x="${size / 2}" y="${size * 0.87}" font-family="DejaVu Sans, sans-serif" font-weight="800"
-        font-size="${fontSize}" fill="#ffffff" text-anchor="middle" letter-spacing="2">${formatted}</text>
+  <!-- caption "MSIM Number" -->
+  <text x="${textLeft}" y="${bottomY}" font-family="sans-serif" font-weight="600"
+        font-size="${captionSize}" fill="rgba(255,255,255,0.75)" text-anchor="start" letter-spacing="0.03em">MSIM Number</text>
+
+  <!-- сам номер -->
+  <text x="${textLeft}" y="${bottomY - captionSize * 2.3}" font-family="'DejaVu Sans Mono', monospace" font-weight="800"
+        font-size="${numberSize}" fill="#ffffff" text-anchor="start" letter-spacing="0.05em">${formatted}</text>
+
+  <!-- префикс +999 -->
+  <text x="${textLeft}" y="${bottomY - captionSize * 2.3 - numberSize * 1.15}" font-family="'DejaVu Sans Mono', monospace" font-weight="800"
+        font-size="${numberSize}" fill="#ffffff" text-anchor="start" letter-spacing="0.05em">+999</text>
 </svg>`.trim();
 }
 

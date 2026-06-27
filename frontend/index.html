@@ -111,7 +111,7 @@
 
     .mint-logo {
       position: absolute; top: 24px; right: 24px;
-      width: 70px; height: 70px; object-fit: cover; opacity: 1;
+      width: 150px; height: 150px; object-fit: cover; opacity: 1;
 	    border-radius: 0;
       filter: drop-shadow(0 2px 8px rgba(35, 23, 54, 0.89));
     }
@@ -198,7 +198,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      transform: translateY(-12px);
+      transform: translateY(-20px);
     }
     .tab-center .dock {
       width: 20px;
@@ -330,16 +330,32 @@ padding:10px;
       <section id="page-apps" class="hidden">
         <div class="card" style="text-align:center; min-height:220px; display:flex; align-items:center; justify-content:center;">
           <p style="margin:0; color:var(--text-dim); font-size:15px; line-height:1.5; max-width:320px;">
-            In the future, connected websites and apps will appear here, where you'll be able to use this number.
+            In the future connected websites and apps will appear here, where you'll be able to use this number.
           </p>
         </div>
       </section>
 
       <section id="page-news" class="hidden">
-        <div class="card" style="text-align:center">
-          <h3 style="margin:0 0 8px; font-weight:800;">News</h3>
-          <p style="margin:6px 0 14px; color:var(--text-dim)">Our Telegram chanel</p>
-          <a id="tgLink" class="btn" target="_blank" rel="noreferrer">Open Telegram</a>
+        <div class="card" style="
+          width: 170%;
+          margin-left: -35%;
+          min-height: 320px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          text-align: center;
+          padding: 24px;
+        ">
+          <h3 style="margin:0; font-weight:800;">News</h3>
+
+          <p style="margin:0; color:var(--text-dim);">
+            Our Telegram channel
+          </p>
+
+          <a id="tgLink" class="btn" target="_blank" rel="noreferrer">
+            Open Telegram
+          </a>
         </div>
       </section>
 
@@ -799,7 +815,7 @@ async function mintNumber() {
         d.x += d.vx; d.y += d.vy;
         if (d.x < 0 || d.x > W) d.vx *= -1;
         if (d.y < 0 || d.y > H) d.vy *= -1;
-        
+
         ctx.globalAlpha = d.a;
         ctx.beginPath();
         ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);

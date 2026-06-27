@@ -45,6 +45,7 @@ app.use('/images', express.static(imagesDir));
 app.use('/api/mint', require('./routes/mint'));
 app.use('/api/nft',  require('./routes/nft'));
 app.use('/meta',     require('./routes/meta'));
+app.use('/api/numbers', require('./routes/numbers'));
 
 // ─── HEALTH (used by Railway's healthcheck) ─────────────────────────────────
 app.get('/health', (_req, res) => res.json({ ok: true }));
