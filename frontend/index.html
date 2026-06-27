@@ -238,7 +238,10 @@ grid-template-columns:1fr auto 1fr;
 padding:10px;
 }
 .brand{justify-self:start;font-size:20px;}
-.wallet-left{justify-self:center;flex:none;width: 100%;text-align: center;}
+.wallet-left {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-size: 12px; color: var(--text-dim);
+}
 .wallet-chip{max-width:140px;overflow:hidden;}
 .wallet-actions{justify-self:end;gap:5px;}
 #disconnectBtn{padding:8px 12px;font-size:13px;}
