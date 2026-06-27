@@ -40,7 +40,7 @@ function buildCardSvg(number) {
     const logoX = size - logoSize - size * 0.056;
     const logoY = size * 0.056;
 
-    const textLeft = size * 0.7;
+    const textLeft = size * 0.07;
     const captionSize = size * 0.030;
     const numberSize  = size * 0.102;
     const bottomY = size - size * 0.042;
