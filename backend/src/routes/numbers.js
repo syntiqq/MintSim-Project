@@ -4,9 +4,6 @@ const router = express.Router();
 function tonApiBase() {
     return (process.env.TON_NETWORK === 'testnet') ? 'https://testnet.tonapi.io' : 'https://tonapi.io';
 }
-
-// Достаём 8 цифр номера из метаданных NFT, независимо от того,
-// как именно они были записаны (с +999, без, с дублем и т.п.)
 function extractDigits(item) {
     const attrs = item?.metadata?.attributes || [];
     const attr = attrs.find(a => a.trait_type === 'number');
@@ -19,8 +16,7 @@ function formatDigits(digits) {
     return `+999 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 8)}`;
 }
 
-// GET /api/numbers/:wallet — читает NFT именно из ТВОЕЙ коллекции (GETGEMS_COLLECTION),
-// принадлежащие подключённому кошельку, прямо из блокчейна (через TonAPI).
+// GET /api/numbers/:wallet numbers
 router.get('/:wallet', async (req, res) => {
     try {
         const { wallet } = req.params;
@@ -30,7 +26,7 @@ router.get('/:wallet', async (req, res) => {
             return res.status(500).json({ ok: false, error: 'config', detail: 'GETGEMS_COLLECTION not set' });
         }
 
-        const url = `${tonApiBase()}/v2/accounts/${wallet}/nfts?collection=${collectionAddr}&limit=1000`;
+        const url = `${tonApiBase()}/v2/accounts/${encodeURIComponent(wallet)}/nfts?collection=${encodeURIComponent(collectionAddr)}&limit=1000`;
         const headers = process.env.TONAPI_KEY ? { Authorization: `Bearer ${process.env.TONAPI_KEY}` } : {};
 
         const r = await fetch(url, { headers });

@@ -2,8 +2,9 @@ const express = require('express');
 const crypto   = require('crypto');
 const router   = express.Router();
 const { renderCardPng } = require('../utils/cardImage');
-
 const { generateNumber } = require('../utils/generateNumber');
+const rateLimit = require('express-rate-limit');
+const orderLimiter = rateLimit({ windowMs: 60_000, max: 5 });
 
 let prisma = null;
 try { ({ prisma } = require('../db')); } catch {}
@@ -17,12 +18,8 @@ function toDetail(e) {
     return e?.message || String(e);
 }
 
-// ─── POST /api/mint/order ──────────────────────────────────────────────────
-// Creates a pending order. The frontend must then send a PLAIN TON transfer
-// of exactly `amountNano` nanoTON, with `comment` as the text comment,
-// to `collectionAddress`. The backend watches for that payment and mints
-// automatically once it's confirmed — see jobs/PaymentWatcher.js.
-router.post('/order', async (req, res) => {
+// POST /api/mint/order
+router.post('/order', orderLimiter, async (req, res) => {
     try {
         const tgId = req.headers['x-tg-id'] || 'web-user';
         const { walletAddress } = req.body || {};
@@ -73,8 +70,7 @@ router.post('/order', async (req, res) => {
     }
 });
 
-// ─── GET /api/mint/order/:id ────────────────────────────────────────────────
-// Frontend polls this to know when payment was detected and the NFT minted.
+// GET /api/mint/order/:id 
 router.get('/order/:id', async (req, res) => {
     try {
         if (!prisma?.mint?.findUnique) {
@@ -88,7 +84,7 @@ router.get('/order/:id', async (req, res) => {
     }
 });
 
-// ─── GET /api/mint/my ───────────────────────────────────────────────────────
+// GET /api/mint/my 
 router.get('/my', async (req, res) => {
     try {
         const tgId = req.headers['x-tg-id'];
@@ -105,7 +101,6 @@ router.get('/my', async (req, res) => {
     }
 });
 
-// ─── GET /api/mint/meta/:number  (fallback TEP-64 metadata, pre-Pinata) ────
 router.get('/meta/:number', (req, res) => {
     const number = req.params.number;
     const backendUrl = process.env.BACKEND_PUBLIC_URL || 'http://localhost:4000';
@@ -116,7 +111,7 @@ router.get('/meta/:number', (req, res) => {
         attributes: [{ trait_type: 'number', value: number }]
     });
 });
-// GET /api/mint/card/:filename — генерирует PNG-карточку с номером
+// GENERATING CARD
 router.get('/card/:filename', async (req, res) => {
     try {
         const number = req.params.filename.replace(/\.png$/i, '');

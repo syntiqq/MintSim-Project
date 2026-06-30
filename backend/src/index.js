@@ -6,18 +6,18 @@ require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
 const app = express();
 
-// ─── CORS ────────────────────────────────────────────────────────────────────
-// Allows your Vercel frontend (any *.vercel.app preview/prod URL) plus
-// localhost for development. Tighten ALLOWED_ORIGIN in .env for stricter prod.
-const EXTRA_ORIGIN = process.env.ALLOWED_ORIGIN; // e.g. https://your-app.vercel.app
+// CORS
+const EXTRA_ORIGIN = process.env.ALLOWED_ORIGIN;
 
 function isAllowedOrigin(origin) {
-    if (!origin) return true; // non-browser clients (curl, server-to-server)
+    if (!origin) return true;
     if (origin.includes('localhost')) return true;
-    if (origin.endsWith('.vercel.app')) return true;
+    if (origin === 'https://mintsim.uk' || origin === 'https://www.mintsim.uk') return true;
     if (EXTRA_ORIGIN && origin === EXTRA_ORIGIN) return true;
     return false;
 }
+
+app.use(require('helmet')());
 
 app.use((req, res, next) => {
     const origin = req.headers.origin;
@@ -37,17 +37,19 @@ app.set('trust proxy', true);
 app.use(express.json({ limit: '10mb' }));
 app.use(morgan('dev'));
 
-// ─── STATIC ──────────────────────────────────────────────────────────────────
+// STATIC
 const imagesDir = path.resolve(__dirname, '..', 'images');
 app.use('/images', express.static(imagesDir));
 
-// ─── ROUTES ──────────────────────────────────────────────────────────────────
+// ROUTES
 app.use('/api/mint', require('./routes/mint'));
 app.use('/api/nft',  require('./routes/nft'));
 app.use('/meta',     require('./routes/meta'));
 app.use('/api/numbers', require('./routes/numbers'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/referral', require('./routes/referral'));
 
-// ─── HEALTH (used by Railway's healthcheck) ─────────────────────────────────
+// HEALTH (used by Railway's healthcheck)
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.get('/api/ping', (_req, res) => {
@@ -60,25 +62,25 @@ app.get('/api/env-check', (_req, res) => {
     res.json({ ok: missing.length === 0, missing });
 });
 
-// ─── ERROR HANDLER ───────────────────────────────────────────────────────────
+// ERROR HANDLER 
 app.use((err, _req, res, _next) => {
     console.error('ERROR:', err);
-    res.status(500).json({ ok: false, error: 'internal', detail: err.message });
+    res.status(500).json({ ok: false, error: 'internal' });
 });
 
-// ─── START ───────────────────────────────────────────────────────────────────
+// START
 // Railway provides PORT automatically — don't hardcode it.
 const PORT = Number(process.env.PORT || 4000);
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
 
-// ─── PAYMENT WATCHER (polls every 15s for incoming on-chain payments) ──────
+// PAYMENT WATCHER (polls every 15s for incoming on-chain payments)
 try {
     const { checkPayments } = require('../jobs/PaymentWatcher');
     const { prisma }        = require('./db');
 
     let watcherRunning = false;
     setInterval(() => {
-        if (watcherRunning) return; // предыдущий цикл ещё не закончился — пропускаем
+        if (watcherRunning) return; // The previous cycle has not ended yet — skip.
         watcherRunning = true;
         checkPayments(prisma)
             .catch(e => console.error('PaymentWatcher error:', e.message))

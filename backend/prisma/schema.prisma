@@ -39,3 +39,21 @@ model Mint {
   @@index([walletAddress, createdAt])
   @@index([status])
 }
+model User {
+  tgId          String   @id
+  referredBy    String?
+  createdAt     DateTime @default(now())
+
+  @@index([referredBy])
+}
+
+model Withdrawal {
+  id          String   @id @default(cuid())
+  tgId        String
+  amountNano  String
+  status      String   @default("pending") // pending -> sent -> failed
+  txHash      String?
+  createdAt   DateTime @default(now())
+
+  @@index([tgId])
+}

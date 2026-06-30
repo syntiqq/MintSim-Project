@@ -34,7 +34,7 @@ function buildCardSvg(number) {
     const size = 800;
     const logo = getLogoBase64();
     const fontBase64 = getFontBase64();
-    const digits = formatPhoneNumber(number); // "XX XXX XXX", без +999
+    const digits = formatPhoneNumber(number);
 
     const logoSize = size * 0.35;
     const logoX = size - logoSize - size * 0.056;
@@ -70,11 +70,11 @@ function buildCardSvg(number) {
   <text x="${textLeft}" y="${bottomY}" font-family="${fontFamily}" font-weight="600"
         font-size="${captionSize}" fill="rgba(255,255,255,0.75)" text-anchor="start" letter-spacing="0.03em">MSIM Number</text>
 
-  <!-- строка с цифрами номера -->
+  <!-- a string of numbers -->
   <text x="${textLeft}" y="${bottomY - captionSize * 2.3}" font-family="${fontFamily}" font-weight="800"
         font-size="${numberSize}" fill="#ffffff" text-anchor="start" letter-spacing="0.05em">${digits}</text>
 
-  <!-- +999 отдельной строкой выше -->
+  <!-- +999 -->
   <text x="${textLeft}" y="${bottomY - captionSize * 2.3 - numberSize * 1.15}" font-family="${fontFamily}" font-weight="800"
         font-size="${numberSize}" fill="#ffffff" text-anchor="start" letter-spacing="0.05em">+999</text>
 </svg>`.trim();

@@ -47,10 +47,6 @@ async function getNextItemIndex() {
     return res.stack.readBigNumber();
 }
 
-/**
- * Sends the admin-gated `Mint` message to the Collection contract.
- * Returns { index, nftAddress } once the transaction is confirmed.
- */
 async function mintNft({ ownerAddress, metaUri }) {
     const { keys, wallet } = await adminWallet();
     const tonClient = client();
@@ -80,7 +76,6 @@ async function mintNft({ ownerAddress, metaUri }) {
         })],
     });
 
-    // Wait for the transaction to actually land (seqno bump = confirmed).
     let cur = seqno, attempts = 0;
     while (cur === seqno && attempts < 25) {
         await new Promise(r => setTimeout(r, 2000));
@@ -91,8 +86,6 @@ async function mintNft({ ownerAddress, metaUri }) {
         throw new Error('Mint transaction did not confirm within 50s — check the admin wallet balance');
     }
 
-    // Реальная проверка: индекс должен увеличиться. Если нет — Mint
-    // не выполнился на стороне Collection (например, неверный опкод).
     let indexAfter = await getNextItemIndex();
     let checkAttempts = 0;
     while (indexAfter <= index && checkAttempts < 5) {
@@ -112,4 +105,35 @@ async function mintNft({ ownerAddress, metaUri }) {
     return { index, nftAddress: nftAddress.toString() };
 }
 
-module.exports = { mintNft, getNextItemIndex };
+/** Sends a plain TON transfer from the admin wallet — used for referral reward withdrawals. */
+async function sendTon({ toAddress, amountNano }) {
+    const { keys, wallet } = await adminWallet();
+    const tonClient = client();
+    const opened    = tonClient.open(wallet);
+
+    const seqno = await opened.getSeqno();
+
+    await opened.sendTransfer({
+        seqno,
+        secretKey: keys.secretKey,
+        messages: [internal({
+            to:    Address.parse(toAddress),
+            value: BigInt(amountNano),
+            body:  beginCell().storeUint(0, 32).storeStringTail('MintSim referral reward').endCell(),
+        })],
+    });
+
+    let cur = seqno, attempts = 0;
+    while (cur === seqno && attempts < 25) {
+        await new Promise(r => setTimeout(r, 2000));
+        cur = await opened.getSeqno();
+        attempts++;
+    }
+    if (cur === seqno) {
+        throw new Error('Withdraw transaction did not confirm within 50s — check the admin wallet balance');
+    }
+
+    return { ok: true };
+}
+
+module.exports = { mintNft, getNextItemIndex, sendTon };

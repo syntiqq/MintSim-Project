@@ -1,8 +1,3 @@
-// Polls TonAPI for incoming transactions to the Collection contract address,
-// matches them against pending orders (by the one-time comment code), and —
-// once a matching payment is found — uploads metadata to Pinata and triggers
-// the on-chain Mint. Runs in a simple sequential loop (one order at a time)
-// to avoid two orders racing for the same nextItemIndex.
 const { pinJson }   = require('../src/utils/pinata');
 const { mintNft }   = require('../src/services/mintOnChain');
 const { formatPhoneNumber } = require('../src/utils/formatNumber');
@@ -30,7 +25,7 @@ function decodeComment(tx) {
         if (msg.decoded_op_name === 'text_comment' && msg.decoded_body?.text) {
             return msg.decoded_body.text;
         }
-        return msg.message || null; // older TonAPI shapes expose it directly
+        return msg.message || null;
     } catch {
         return null;
     }
@@ -52,11 +47,11 @@ async function checkPayments(prisma) {
         console.error('PaymentWatcher: could not fetch transactions:', e.message);
         return;
     }
-console.log('PaymentWatcher: получено транзакций —', txs.length);
+console.log('PaymentWatcher: transactions received —', txs.length);
 if (txs.length > 0) {
-    console.log('PaymentWatcher: пример in_msg —', JSON.stringify(txs[0].in_msg));
+    console.log('PaymentWatcher: example in_msg —', JSON.stringify(txs[0].in_msg));
 }
-    // Sequential on purpose — keeps Mint index assignment race-free.
+
     for (const order of pending) {
         const match = txs.find(tx => decodeComment(tx) === order.comment);
         if (!match) continue;
@@ -70,7 +65,7 @@ if (txs.length > 0) {
         try {
             await prisma.mint.update({ where: { id: order.id }, data: { status: 'paid', txHash: match.hash } });
 
-            // ── Upload metadata to Pinata ────────────────────────────────────
+         
             const formatted = `+999 ${formatPhoneNumber(order.number)}`;
             const meta = {
                 name: formatted,
@@ -80,7 +75,7 @@ if (txs.length > 0) {
             };
             const pinned = await pinJson(meta, `number-${order.number}.json`);
             console.log(`Order ${order.id}: Pinata OK →`, pinned.gatewayUrl);
-            // ── On-chain mint (admin wallet) ─────────────────────────────────
+            
             const result = await mintNft({
                 ownerAddress: order.walletAddress,
                 metaUri: pinned.gatewayUrl,
