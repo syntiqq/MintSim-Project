@@ -339,16 +339,16 @@
     padding:10px;
   }
   
-  /* Уменьшаем кнопку MintSim в 2 раза на мобилках */
-  #mintsimBtn {
-    font-size: 10px; 
-    padding: 4px 4px; 
+
+  .mintsimBtn {
+    font-size: 12px; 
+    padding: 6px 2px; 
     border-radius: 6px;
   }
   .withdraw-btn { width: 50%;
       margin: 14px auto;
       display: block;
-      font-size: 11px;
+      font-size: 14px;
       padding: 12px 10px;
     }
 
@@ -368,17 +368,39 @@
   .mint-number-caption {font-size: 11px;}
   .mint-logo {top: 16px;right: 8px;width: 70px;height: 70px;}
 
-  /* Оставляем карточки Main в ряд, но даем горизонтальный скролл на случай совсем узкого экрана */
   .main-panels { 
     flex-direction: row; 
     overflow-x: auto; 
     padding-bottom: 10px; 
   }
   .main-panel {
-    min-width: 140px; /* Чтобы текст внутри не сплющило в кашу */
+    min-width: 140px;
+  }
+  #page-referral .card {
+    padding: 14px; /* Внутренние отступы (сделай меньше, если карточка слишком "толстая") */
+    margin: 0; /* Внешние отступы, если нужно сдвинуть */
   }
 
+  /* 2. Высота карточки и настройка скролла для списка */
+  #page-referral .card-numbers {
+    /* На компе стоит формула calc(100vh - ...), для телефона можешь задать жесткую высоту в процентах экрана: */
+    max-height: 65vh; /* 65% от высоты экрана. Меняй цифру, чтобы список рефералов влезал лучше */
+  }
+
+  /* 3. Окошко с самой реферальной ссылкой */
+  #page-referral #refLink {
+    font-size: 12px; /* Уменьшить шрифт ссылки */
+    padding: 8px; /* Сделать блок ссылки у́же */
+  }
+
+  /* 4. Маленькие карточки статистики (Reward / Earned) */
+  #page-referral .ref-stats {
+    gap: 8px; /* Расстояние между левой и правой плашкой */
+    margin: 10px 0; /* Отступы сверху и снизу */
+  }
 }
+
+
   </style>
 </head>
 <body>
@@ -506,7 +528,7 @@
     </div> <div class="container-wide">
       <section id="page-main" class="hidden">
         <div class="main-panels" style="gap: 16px;"> <div class="main-panel">
-            <div class="main-panel-title">👑</div>
+            <div class="main-panel-title">TOP 👑</div>
             <div id="topList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
             <div id="myRankRow"></div>
           </div>
