@@ -7,15 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/icon.png" type="image/png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/iosevka@5.2.6/index.css">
-	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- TonConnect SDK (если подключаешь в будущем) -->
   <script src="https://unpkg.com/@tonconnect/sdk/dist/tonconnect.min.js"></script>
 
   <style>
     /* ===== MAIN PAGE (TOP / BEAUTIFUL / EXPENSIVE) ===== */
-  #page-main { display: none; }
-  #page-main.active { display: flex; flex-direction: column; gap: 14px; }
+  #page-main { display: flex; flex-direction: column; gap: 14px; }
   .main-panels {
     display: flex; gap: 12px; align-items: flex-start;
   }
@@ -137,8 +135,8 @@
 
     /* ===== КОНТЕНТНЫЕ СЕКЦИИ ===== */
     /* увеличил нижний отступ, чтобы полностью была видна карточка и место под таббар */
-    main { padding: 18px 14px 140px; }
-    .container { max-width: 560px; margin: 0 auto; }
+    main { padding: 18px 14px 140px; width: 100%;}
+    .container { max-width: 560px; margin: 0 auto; width: 100%;}
 
     #page-mint { display: flex; flex-direction: column; align-items: center; }
 
@@ -152,13 +150,13 @@
       background: rgba(35, 23, 54, 0.89); /* фон */
       border: 2px solid var(--border);
       box-shadow: 0 16px 26px rgba(0,0,0,.38);
-	    opacity: .85;
+      opacity: .85;
     }
 
     .mint-logo {
       position: absolute; top: 24px; right: 16px;
       width: 150px; height: 150px; object-fit: cover; opacity: 1;
-	    border-radius: 0;
+      border-radius: 0;
       filter: drop-shadow(0 2px 8px rgba(35, 23, 54, 0.89));
     }
     .mint-number {
@@ -356,7 +354,7 @@ padding:10px;
   <canvas id="particles"></canvas>
 
   <header>
-    <button class="brand" onclick="openTab('main')" style="background:none;border:none;cursor:pointer;color:white;padding:0;">MintSim</button>
+    <button class="btn" onclick="openTab('main')" style="font-weight: 800; font-size: 18px; padding: 8px 16px; border-radius: 12px;">MintSim</button>
     <div class="wallet-left" id="walletLeft">
       <span class="wallet-chip" id="walletChip" style="display:none">
         <span id="walletShort">—</span>
@@ -384,9 +382,9 @@ padding:10px;
         <div class="minted-line">
           <span id="mintedCount">0</span> numbers already minted
         </div>
-	      <div style="display: flex; justify-content: center; margin-top: 10px;">
-    		  <button class="btn btn-mint-big" onclick="mintNumber()">Mint Number</button>
- 	      </div>
+        <div style="display: flex; justify-content: center; margin-top: 10px;">
+          <button class="btn btn-mint-big" onclick="mintNumber()">Mint Number</button>
+        </div>
       </section>
 
       <section id="page-referral" class="hidden">
@@ -441,13 +439,13 @@ padding:10px;
           <a class="app-row" href="https://getgems.io/collection/YOUR_COLLECTION_ADDRESS" target="_blank" rel="noreferrer">
             <img class="app-row-logo" src="https://getgems.io/favicon.ico" alt="Getgems">
             <div class="app-row-text">
-              <div class="app-row-title">EQBU2gRGubbxHOe_WcEmReoAIB44U4RGLQ0VSvNbGyrDX2jo</div>
+              <div class="app-row-title">getgems.io</div>
               <div class="app-row-sub">View and trade MintSim numbers on Getgems marketplace</div>
             </div>
           </a>
 
           <a class="app-row" href="https://t.me/MintSim_OTC" target="_blank" rel="noreferrer">
-            <img class="app-row-logo" src="/logo.PNG" alt="MintSim OTC">
+            <img class="app-row-logo" src="/logo.png" alt="MintSim OTC">
             <div class="app-row-text">
               <div class="app-row-title">MintSim OTC</div>
               <div class="app-row-sub">Buy and sell numbers peer-to-peer in Telegram</div>
@@ -480,31 +478,29 @@ padding:10px;
         </div>
       </section>
 
+      <section id="page-main" class="hidden">
+        <div class="main-panels">
+
+          <div class="main-panel">
+            <div class="main-panel-title">💎 Most Expensive</div>
+            <div id="expensiveList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
+          </div>
+
+          <div class="main-panel" style="flex:1.4">
+            <div class="main-panel-title">👑 TOP</div>
+            <div id="topList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
+            <div id="myRankRow"></div>
+          </div>
+
+          <div class="main-panel">
+            <div class="main-panel-title">💎 Most Beautiful</div>
+            <div id="beautifulList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
+          </div>
+
+        </div>
+      </section>
+
     </div>
-    <section id="page-main" class="hidden">
-      <div class="main-panels">
-
-        <!-- Слева: самые дорогие -->
-        <div class="main-panel">
-          <div class="main-panel-title">💎 Most Expensive</div>
-          <div id="expensiveList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
-        </div>
-
-        <!-- Центр: TOP -->
-        <div class="main-panel" style="flex:1.4">
-          <div class="main-panel-title">👑 TOP</div>
-          <div id="topList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
-          <div id="myRankRow"></div>
-        </div>
-
-        <!-- Справа: самые красивые -->
-        <div class="main-panel">
-          <div class="main-panel-title">💎 Most Beautiful</div>
-          <div id="beautifulList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
-        </div>
-
-      </div>
-    </section>
   </main>
 
   <nav class="tabbar">
@@ -576,17 +572,17 @@ padding:10px;
     else updateWalletUI('', '');
   });
 
-  // === Telegram auth (мягкая, если эндпоинта нет — пропускаем) ===
+  // === Telegram auth ===
   let AUTH = { token: null, user: null };
 
   function getInitData() {
     const tg = window.Telegram?.WebApp;
     return tg?.initData || '';
   }
+  
   function formatNumber(raw) {
-  // подгони паттерн под реальную длину/группировку твоего number (тут пример 2-3-3)
-  const digits = String(raw).replace(/\D/g, '');
-  return digits.replace(/(\d{2})(\d{3})(\d{3})/, '$1 $2 $3');
+    const digits = String(raw).replace(/\D/g, '');
+    return digits.replace(/(\d{2})(\d{3})(\d{3})/, '$1 $2 $3');
   }
 
   function getTgId() {
@@ -607,13 +603,6 @@ padding:10px;
     return localStorage.getItem('referred-by') || null;
   }
 
-  function getRefFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    if (ref) localStorage.setItem('referred-by', ref);
-    return localStorage.getItem('referred-by') || null;
-  }
-
   async function authWithTelegram() {
   try {
     const initData = getInitData();
@@ -623,7 +612,6 @@ padding:10px;
       body: JSON.stringify({ initData, ref: getRefFromUrl() })
     });
 
-    // если роут не существует — тихо выходим
     if (res.status === 404) {
       console.log('Auth endpoint not found — skipping Telegram auth (ok).');
       return;
@@ -678,7 +666,7 @@ padding:10px;
     }
   }
 
-  // === Сборка comment-payload без бандлера, через esm.sh ===
+  // === Сборка comment-payload ===
 async function buildCommentPayload(comment) {
   const { beginCell } = await import('https://esm.sh/@ton/core@0.59.0');
   return beginCell()
@@ -689,7 +677,7 @@ async function buildCommentPayload(comment) {
     .toString('base64');
 }
 
-// === Опрос статуса заказа до подтверждения ===
+// === Опрос статуса ===
 function pollOrderStatus(orderId, onUpdate) {
   return new Promise((resolve) => {
     const interval = setInterval(async () => {
@@ -711,7 +699,7 @@ function pollOrderStatus(orderId, onUpdate) {
 
 // === Mint ===
 async function mintNumber() {
-  const btn = document.querySelector('#page-mint button.btn');
+  const btn = document.querySelector('#page-mint button.btn-mint-big');
   try {
     if (btn) { btn.disabled = true; btn.textContent = 'Minting nft…'; }
 
@@ -725,7 +713,7 @@ async function mintNumber() {
     const orderRes = await fetch(`${BACKEND_URL}/api/mint/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-tg-id': getTgId() },
-      body: JSON.stringify({ walletAddress: wallet.address })
+      body: JSON.stringify({ walletAddress: wallet.address, ref: getRefFromUrl() })
     });
     const order = await orderRes.json();
     if (!orderRes.ok || !order.ok) throw new Error(order?.detail || 'Could not create an order');
@@ -763,9 +751,7 @@ async function mintNumber() {
   }
 }
 
-  // === Реферал: награда за 1 реферала ===
-  // Чтобы поменять сумму вручную — меняй REFERRAL_REWARD_GRAM.
-  // Когда будет готов backend, он может присылать актуальное значение в data.rewardPerReferral.
+  // === Реферал ===
   const REFERRAL_REWARD_GRAM = 0.5;
 
   function renderReferralList(list) {
@@ -837,10 +823,6 @@ async function mintNumber() {
   }
 
   // === Boot ===
-  // ===== Кол-во сминченных номеров =====
-  // Чтобы поменять цифру вручную — меняй MINTED_COUNT.
-  // Когда будет готов backend-эндпоинт (например GET /api/mint/count),
-  // замени эту строку на fetch и подставляй реальное значение.
   const MINTED_COUNT = 12345;
   document.getElementById('mintedCount').textContent = MINTED_COUNT;
 
@@ -850,7 +832,7 @@ async function mintNumber() {
     await loadReferralFromBackend();
   })();
 
-  // === Проверка связи с бэком (устойчивая) ===
+  // === Проверка связи с бэком ===
   (async () => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/ping`, { cache: 'no-store' });
@@ -898,7 +880,7 @@ async function mintNumber() {
   }
 
   function buildReferralLink() {
-    const addrOrCode = getCurrentWalletAddress() || 'YOUR_REF_CODE';
+    const addrOrCode = getCurrentWalletAddress() || 'YOUR_WALLET';
     const link = SITE_URL + '/?ref=' + encodeURIComponent(addrOrCode);
     document.getElementById('refLink').textContent = link;
     return link;
@@ -914,13 +896,6 @@ async function mintNumber() {
     }
   }
 
-  function buildReferralLink() {
-    const addrOrCode = getCurrentWalletAddress() || 'YOUR_WALLET';
-    const link = SITE_URL + '/?ref=' + encodeURIComponent(addrOrCode);
-    document.getElementById('refLink').textContent = link;
-    return link;
-}
-
   async function withdrawReward() {
     const wallet = tcUi.account;
     if (!wallet?.address) { alert('Connect your wallet first'); return; }
@@ -934,17 +909,12 @@ async function mintNumber() {
     } catch (e) {
         alert('❌ Withdraw failed: ' + (e?.message || e));
     }
-
 }
 
   async function copyReferral() {
     const link = buildReferralLink();
     await navigator.clipboard.writeText(link);
     alert('The link is copied✅');
-  }
-  function formatNumber(raw) {
-  const digits = String(raw).padStart(8, '0').slice(0, 8);
-  return `${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 8)}`;
   }
 
   function shortAddr(a){ return a && a.length > 12 ? (a.slice(0,6) + '…' + a.slice(-4)) : (a || ''); }
