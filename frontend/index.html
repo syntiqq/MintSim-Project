@@ -133,14 +133,6 @@
       border-radius: 18px;
     }
 
-    /* Уменьшенная кнопка Withdraw */
-    .withdraw-btn {
-      width: 50% !important;
-      margin: 14px auto !important;
-      display: block !important;
-      font-size: 16px !important;
-      padding: 26px 16px !important;
-    }
 
     /* ===== КОНТЕНТНЫЕ СЕКЦИИ ===== */
     main { padding: 18px 14px 140px; width: 100%;}
@@ -202,6 +194,13 @@
     .minted-line { margin-top: 14px; text-align: center; color: var(--text-dim); font-size: 15px; }
 
     .ref-stats { display: flex; gap: 12px; margin: 14px 0; }
+    /* Уменьшенная кнопка Withdraw */
+    .withdraw-btn { width: 50%;
+      margin: 14px auto;
+      display: block;
+      font-size: 16px;
+      padding: 20px 16px;
+    }
     .ref-stat {
       flex: 1; background: rgba(255,255,255,.06); border: 1px solid var(--border);
       border-radius: 12px; padding: 10px 12px;
@@ -267,7 +266,8 @@
       display: flex;
       flex-direction: column;
     }
-    .card-numbers .numbers-list .ref-list {
+    .card-numbers .numbers-list,
+    .card-numbers .ref-list {
       overflow-y: auto;
       flex: 1;
       padding-right: 4px;
@@ -341,10 +341,16 @@
   
   /* Уменьшаем кнопку MintSim в 2 раза на мобилках */
   #mintsimBtn {
-    font-size: 13px; 
+    font-size: 10px; 
     padding: 4px 4px; 
-    border-radius: 8px;
+    border-radius: 6px;
   }
+  .withdraw-btn { width: 50%;
+      margin: 14px auto;
+      display: block;
+      font-size: 11px;
+      padding: 12px 10px;
+    }
 
   .brand{grid-column:1; justify-self:start; font-size:20px;}
   .wallet-left {
@@ -369,8 +375,9 @@
     padding-bottom: 10px; 
   }
   .main-panel {
-    min-width: 100px; /* Чтобы текст внутри не сплющило в кашу */
+    min-width: 140px; /* Чтобы текст внутри не сплющило в кашу */
   }
+
 }
   </style>
 </head>
@@ -498,22 +505,17 @@
       </section>
     </div> <div class="container-wide">
       <section id="page-main" class="hidden">
-        <div class="main-panels">
-          <div class="main-panel">
-            <div class="main-panel-title">💎 Most Expensive</div>
-            <div id="expensiveList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
-          </div>
-
-          <div class="main-panel" style="flex:1.4">
-            <div class="main-panel-title">👑 TOP</div>
+        <div class="main-panels" style="gap: 16px;"> <div class="main-panel">
+            <div class="main-panel-title">👑</div>
             <div id="topList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
             <div id="myRankRow"></div>
           </div>
 
           <div class="main-panel">
-            <div class="main-panel-title">💎 Most Beautiful</div>
+            <div class="main-panel-title">💎</div>
             <div id="beautifulList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
           </div>
+
         </div>
       </section>
     </div>
