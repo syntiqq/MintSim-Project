@@ -340,7 +340,7 @@
   }
   
 
-  .mintsimBtn {
+  #mintsimBtn {
     width: 40px;
     max-width: 50px;
     font-size: 10px;
@@ -801,7 +801,7 @@ async function mintNumber() {
         <div class="ref-row">
             <span class="mono" title="${r.wallet}">${r.walletShort || shortAddr(r.wallet)}</span>
             <span>${r.mints}</span>
-            <span>${(r.rewardTon || 0).toFixed(2)} TON</span>
+            <span>${(r.rewardTon || 0).toFixed(2)} GRAM</span>
         </div>
     `).join('');
 }
@@ -809,14 +809,14 @@ async function mintNumber() {
   async function loadReferralFromBackend() {
     const wallet = getCurrentWalletAddress();
     if (!wallet) {
-        document.getElementById('refReward').textContent = '0.5 TON per mint';
+        document.getElementById('refReward').textContent = '0.5 GRAM';
         renderReferralList([]);
         return;
     }
     try {
         const data = await api(`/api/referral/me?wallet=${encodeURIComponent(wallet)}`, { method: 'GET' });
-        document.getElementById('refReward').textContent = (data.rewardPerMint || 0.5) + ' TON per mint';
-        document.getElementById('refEarned').textContent = (data.totalEarned || 0).toFixed(2) + ' TON';
+        document.getElementById('refReward').textContent = (data.rewardPerMint || 0.5) + ' GRAM';
+        document.getElementById('refEarned').textContent = (data.totalEarned || 0).toFixed(2) + ' GRAM';
         if (data.totalAvailable > 0) {
             document.getElementById('withdrawBtn').style.display = 'block';
         }
