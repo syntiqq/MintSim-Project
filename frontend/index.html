@@ -24,17 +24,17 @@
     min-width: 0;
   }
   .main-panel-title {
-    font-size: 13px; font-weight: 800; text-align: center;
+    font-size: 20px; font-weight: 800; text-align: center;
     margin-bottom: 4px; white-space: nowrap;
   }
   .rank-row {
     display: flex; align-items: center; gap: 6px;
-    font-size: 11px; padding: 5px 6px;
+    font-size: 14px; padding: 5px 6px;
     background: rgba(255,255,255,.05); border-radius: 8px;
   }
   .rank-num { font-weight: 800; color: var(--text-dim); min-width: 16px; }
   .rank-val { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .rank-sub { color: var(--text-dim); font-size: 10px; white-space: nowrap; }
+  .rank-sub { color: var(--text-dim); font-size: 14px; white-space: nowrap; }
   .rank-row.my-rank { background: rgba(140,110,255,.18); border: 1px solid rgba(140,110,255,.35); }
 
   /* ===== APPS PAGE ===== */
@@ -102,11 +102,11 @@
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
     }
-    .brand { font-weight: 800; letter-spacing: .4px; font-size: 24px; }
+
     
     /* Кнопка логотипа MintSim в шапке */
     #mintsimBtn {
-      font-weight: 800; font-size: 18px; padding: 8px 16px; border-radius: 12px;
+      font-weight: 800; font-size: 18px; padding: 8px 20px; border-radius: 12px;
     }
 
     .wallet-left {
@@ -341,11 +341,11 @@
   
 
   .mintsimBtn {
-    width: 40px !important;
-    max-width: 50px!important;
-    font-size: 10px!important;
-    padding: 4px 2px!important; 
-    border-radius: 8px!important;
+    width: 40px;
+    max-width: 50px;
+    font-size: 10px;
+    padding: 4px 2px;
+    border-radius: 8px;
   }
   .withdraw-btn { width: 50%;
       margin: 14px auto;
@@ -353,8 +353,6 @@
       font-size: 12px;
       padding: 10px 8px;
     }
-
-  .brand{grid-column:1; justify-self:start; font-size:10px;}
   .wallet-left {
     position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
     font-size: 12px; color: var(--text-dim);
@@ -379,26 +377,19 @@
     min-width: 140px;
   }
   #page-referral .card {
-    padding: 12px; /* Внутренние отступы (сделай меньше, если карточка слишком "толстая") */
-    margin: 0; /* Внешние отступы, если нужно сдвинуть */
+    padding: 12px; 
+    margin: 0; 
   }
-
-  /* 2. Высота карточки и настройка скролла для списка */
   #page-referral .card-numbers {
-    /* На компе стоит формула calc(100vh - ...), для телефона можешь задать жесткую высоту в процентах экрана: */
-    max-height: 70vh; /* 65% от высоты экрана. Меняй цифру, чтобы список рефералов влезал лучше */
+    max-height: 70vh; 
   }
-
-  /* 3. Окошко с самой реферальной ссылкой */
   #page-referral #refLink {
-    font-size: 8px; /* Уменьшить шрифт ссылки */
-    padding: 6px; /* Сделать блок ссылки у́же */
+    font-size: 8px; 
+    padding: 6px;
   }
-
-  /* 4. Маленькие карточки статистики (Reward / Earned) */
   #page-referral .ref-stats {
-    gap: 8px; /* Расстояние между левой и правой плашкой */
-    margin: 10px 0; /* Отступы сверху и снизу */
+    gap: 8px; 
+    margin: 10px 0;
   }
 }
 
