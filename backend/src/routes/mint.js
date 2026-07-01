@@ -5,6 +5,8 @@ const { renderCardPng } = require('../utils/cardImage');
 const { generateNumber } = require('../utils/generateNumber');
 const rateLimit = require('express-rate-limit');
 const orderLimiter = rateLimit({ windowMs: 60_000, max: 5 });
+const rateLimit = require('express-rate-limit');
+const orderLimiter = rateLimit({ windowMs: 60_000, max: 5 });
 
 let prisma = null;
 try { ({ prisma } = require('../db')); } catch {}
@@ -23,7 +25,7 @@ router.post('/order', orderLimiter, async (req, res) => {
     try {
         const tgId = req.headers['x-tg-id'] || 'web-user';
         const { walletAddress } = req.body || {};
-
+        const { walletAddress, ref } = req.body || {};
         if (!walletAddress) {
             return res.status(400).json({ ok: false, error: 'bad_request', detail: 'walletAddress required' });
         }
@@ -35,6 +37,18 @@ router.post('/order', orderLimiter, async (req, res) => {
         }
 
         if (!prisma?.mint?.create) {
+            if (ref && prisma?.referral) {
+        const normalRef = String(ref).trim().toLowerCase();
+            const normalWallet = walletAddress.trim().toLowerCase();
+            if (normalRef !== normalWallet) {
+                const exists = await prisma.referral.findUnique({ where: { wallet: normalWallet } });
+                if (!exists) {
+                    await prisma.referral.create({
+                        data: { wallet: normalWallet, referredBy: normalRef }
+                    }).catch(() => {}); // игнорируем если уже есть (race condition safe)
+                }
+            }
+        }
             return res.status(500).json({ ok: false, error: 'config', detail: 'Database not available' });
         }
 
@@ -80,7 +94,8 @@ router.get('/order/:id', async (req, res) => {
         if (!rec) return res.status(404).json({ ok: false, error: 'not_found' });
         return res.json({ ok: true, order: rec });
     } catch (e) {
-        return res.status(500).json({ ok: false, error: 'internal', detail: toDetail(e) });
+        console.error('ORDER ERROR:', e);
+        return res.status(500).json({ ok: false, error: 'internal' }); 
     }
 });
 

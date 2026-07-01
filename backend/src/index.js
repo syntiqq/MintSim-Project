@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 app.disable('x-powered-by');
 app.set('trust proxy', true);
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '100kb' })); // было 10mb
 app.use(morgan('dev'));
 
 // STATIC
@@ -48,6 +48,7 @@ app.use('/meta',     require('./routes/meta'));
 app.use('/api/numbers', require('./routes/numbers'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/referral', require('./routes/referral'));
+app.use('/api/stats', require('./routes/stats'));
 
 // HEALTH (used by Railway's healthcheck)
 app.get('/health', (_req, res) => res.json({ ok: true }));

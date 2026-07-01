@@ -13,6 +13,52 @@
   <script src="https://unpkg.com/@tonconnect/sdk/dist/tonconnect.min.js"></script>
 
   <style>
+    /* ===== MAIN PAGE (TOP / BEAUTIFUL / EXPENSIVE) ===== */
+  #page-main { display: none; }
+  #page-main.active { display: flex; flex-direction: column; gap: 14px; }
+  .main-panels {
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .main-panel {
+    flex: 1; background: var(--glass); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 12px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-width: 0;
+  }
+  .main-panel-title {
+    font-size: 13px; font-weight: 800; text-align: center;
+    margin-bottom: 4px; white-space: nowrap;
+  }
+  .rank-row {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; padding: 5px 6px;
+    background: rgba(255,255,255,.05); border-radius: 8px;
+  }
+  .rank-num { font-weight: 800; color: var(--text-dim); min-width: 16px; }
+  .rank-val { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-sub { color: var(--text-dim); font-size: 10px; white-space: nowrap; }
+  .rank-row.my-rank { background: rgba(140,110,255,.18); border: 1px solid rgba(140,110,255,.35); }
+
+  /* ===== APPS PAGE ===== */
+  .app-row {
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(255,255,255,.06); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; cursor: pointer;
+    transition: background .15s;
+    text-decoration: none; color: inherit;
+  }
+  .app-row:hover { background: rgba(255,255,255,.10); }
+  .app-row-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 8px; }
+  .app-row-text { flex: 1; }
+  .app-row-title { font-weight: 700; font-size: 14px; }
+  .app-row-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  /* responsive main panels */
+  @media (max-width: 768px) {
+    .main-panels { flex-direction: column; }
+  }
+
+
     /* ===== БАЗА И ФОН ===== */
     :root {
       --glass: rgba(15, 2, 20, 0.64);
@@ -181,6 +227,25 @@
       background: rgba(255,255,255,.06); border: 1px solid var(--border);
       border-radius: 10px; padding: 10px 12px; font-size: 13px;
     }
+    .ref-row {
+      display: grid;
+      grid-template-columns: 1fr 80px 90px;
+      gap: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      align-items: center;
+    }
+.ref-row-head {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
+}
+.ref-row:not(.ref-row-head) {
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
     .ref-empty { color: var(--text-dim); font-size: 13px; text-align: center; padding: 16px 0; }
 
     .card {
@@ -195,7 +260,7 @@
       display: flex;
       flex-direction: column;
     }
-    .card-numbers .numbers-list {
+    .card-numbers .numbers-list .ref-list {
       overflow-y: auto;
       flex: 1;
       padding-right: 4px; /* чтобы скроллбар не наезжал на текст */
@@ -259,6 +324,8 @@
     }
     .hidden { display: none !important; }
 
+
+
 @media (max-width:768px){
 header{
 display:grid;
@@ -289,7 +356,7 @@ padding:10px;
   <canvas id="particles"></canvas>
 
   <header>
-    <div class="brand">MintSim</div>
+    <button class="brand" onclick="openTab('main')" style="background:none;border:none;cursor:pointer;color:white;padding:0;">MintSim</button>
     <div class="wallet-left" id="walletLeft">
       <span class="wallet-chip" id="walletChip" style="display:none">
         <span id="walletShort">—</span>
@@ -323,7 +390,7 @@ padding:10px;
       </section>
 
       <section id="page-referral" class="hidden">
-        <div class="card">
+        <div class="card card-numbers">
           <h3 style="margin:0 0 12px; font-weight:800;">Referral</h3>
           <div id="refLink" class="mono" style="word-break:break-all; font-size:14px; background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:12px; padding:12px;">
           </div>
@@ -363,10 +430,26 @@ padding:10px;
       </section>
 
       <section id="page-apps" class="hidden">
-        <div class="card" style="text-align:center; min-height:220px; display:flex; align-items:center; justify-content:center;">
-          <p style="margin:0; color:var(--text-dim); font-size:15px; line-height:1.5; max-width:320px;">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <p style="margin:0 0 8px;color:var(--text-dim);font-size:14px;">
             In the future connected websites and apps will appear here, where you'll be able to use this number.
           </p>
+
+          <a class="app-row" href="https://getgems.io/collection/YOUR_COLLECTION_ADDRESS" target="_blank" rel="noreferrer">
+            <img class="app-row-logo" src="https://getgems.io/favicon.ico" alt="Getgems">
+            <div class="app-row-text">
+              <div class="app-row-title">EQBU2gRGubbxHOe_WcEmReoAIB44U4RGLQ0VSvNbGyrDX2jo</div>
+              <div class="app-row-sub">View and trade MintSim numbers on Getgems marketplace</div>
+            </div>
+          </a>
+
+          <a class="app-row" href="https://t.me/MintSim_OTC" target="_blank" rel="noreferrer">
+            <img class="app-row-logo" src="/logo.PNG" alt="MintSim OTC">
+            <div class="app-row-text">
+              <div class="app-row-title">MintSim OTC</div>
+              <div class="app-row-sub">Buy and sell numbers peer-to-peer in Telegram</div>
+            </div>
+          </a>
         </div>
       </section>
 
@@ -395,6 +478,30 @@ padding:10px;
       </section>
 
     </div>
+    <section id="page-main" class="hidden">
+      <div class="main-panels">
+
+        <!-- Слева: самые дорогие -->
+        <div class="main-panel">
+          <div class="main-panel-title">💎 Most Expensive</div>
+          <div id="expensiveList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
+        </div>
+
+        <!-- Центр: TOP -->
+        <div class="main-panel" style="flex:1.4">
+          <div class="main-panel-title">👑 TOP</div>
+          <div id="topList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
+          <div id="myRankRow"></div>
+        </div>
+
+        <!-- Справа: самые красивые -->
+        <div class="main-panel">
+          <div class="main-panel-title">💎 Most Beautiful</div>
+          <div id="beautifulList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
+        </div>
+
+      </div>
+    </section>
   </main>
 
   <nav class="tabbar">
@@ -489,12 +596,20 @@ padding:10px;
     }
     return demo;
   }
+
   function getRefFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
     if (ref) localStorage.setItem('referred-by', ref);
     return localStorage.getItem('referred-by') || null;
-}
+  }
+
+  function getRefFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) localStorage.setItem('referred-by', ref);
+    return localStorage.getItem('referred-by') || null;
+  }
 
   async function authWithTelegram() {
   try {
@@ -653,41 +768,41 @@ async function mintNumber() {
   function renderReferralList(list) {
     const wrap = document.getElementById('referralList');
     if (!list || !list.length) {
-      wrap.innerHTML = '<div class="ref-empty">No referrals yet</div>';
-      return;
+        wrap.innerHTML = '<div class="ref-empty">No referrals yet</div>';
+        return;
     }
     wrap.innerHTML = `
-      <div class="ref-row ref-row-head">
-        <span>User</span><span>Minted</span><span>Reward</span>
-      </div>
+        <div class="ref-row ref-row-head">
+            <span>Wallet</span><span>Mints</span><span>Earned</span>
+        </div>
     ` + list.map(r => `
-      <div class="ref-row">
-        <span>${r.tgId}</span>
-        <span>${r.mints}</span>
-        <span>${r.rewardTon.toFixed(2)} TON</span>
-      </div>
+        <div class="ref-row">
+            <span class="mono" title="${r.wallet}">${r.walletShort || shortAddr(r.wallet)}</span>
+            <span>${r.mints}</span>
+            <span>${(r.rewardTon || 0).toFixed(2)} TON</span>
+        </div>
     `).join('');
 }
 
   async function loadReferralFromBackend() {
-    document.getElementById('refReward').textContent = REFERRAL_REWARD_GRAM + ' GRAM';
-    try {
-      const data = await api('/api/referral/me', { method: 'GET' });
-      if (data?.link) {
-        document.getElementById('refLink').textContent = data.link;
-      }
-      if (typeof data?.rewardPerReferral === 'number') {
-        document.getElementById('refReward').textContent = data.rewardPerReferral + ' GRAM';
-      }
-      if (typeof data?.totalEarned === 'number') {
-        document.getElementById('refEarned').textContent = data.totalEarned + ' GRAM';
-      }
-      renderReferralList(data?.referrals || []);
-    } catch {
-      console.log('No referral from backend (ok). Using local builder.');
-      renderReferralList([]);
+    const wallet = getCurrentWalletAddress();
+    if (!wallet) {
+        document.getElementById('refReward').textContent = '0.5 TON per mint';
+        renderReferralList([]);
+        return;
     }
-  }
+    try {
+        const data = await api(`/api/referral/me?wallet=${encodeURIComponent(wallet)}`, { method: 'GET' });
+        document.getElementById('refReward').textContent = (data.rewardPerMint || 0.5) + ' TON per mint';
+        document.getElementById('refEarned').textContent = (data.totalEarned || 0).toFixed(2) + ' TON';
+        if (data.totalAvailable > 0) {
+            document.getElementById('withdrawBtn').style.display = 'block';
+        }
+        renderReferralList(data?.referrals || []);
+    } catch {
+        renderReferralList([]);
+    }
+}
 
   function renderNumbersList(list) {
     const wrap = document.getElementById('numbersList');
@@ -764,15 +879,15 @@ async function mintNumber() {
   }
 
   function openTab(tab) {
-    document.getElementById('page-referral').classList.toggle('hidden', tab !== 'referral');
-    document.getElementById('page-numbers').classList.toggle('hidden', tab !== 'numbers');
-    document.getElementById('page-mint').classList.toggle('hidden', tab !== 'mint');
-    document.getElementById('page-apps').classList.toggle('hidden', tab !== 'apps');
-    document.getElementById('page-news').classList.toggle('hidden', tab !== 'news');
+    ['referral','numbers','mint','apps','news','main'].forEach(id => {
+        const el = document.getElementById('page-' + id);
+        if (el) el.classList.toggle('hidden', id !== tab);
+    });
     setActiveTab(tab);
-    if (tab === 'referral') buildReferralLink();
+    if (tab === 'referral') { buildReferralLink(); loadReferralFromBackend(); }
     if (tab === 'numbers') loadMyNumbers();
-  }
+    if (tab === 'main') loadMainPage();
+}
   openTab('mint');
 
   function getCurrentWalletAddress() {
@@ -795,19 +910,28 @@ async function mintNumber() {
       await navigator.clipboard.writeText(link); alert('The link is copied✅');
     }
   }
+
+  function buildReferralLink() {
+    const addrOrCode = getCurrentWalletAddress() || 'YOUR_WALLET';
+    const link = SITE_URL + '/?ref=' + encodeURIComponent(addrOrCode);
+    document.getElementById('refLink').textContent = link;
+    return link;
+}
+
   async function withdrawReward() {
-  const wallet = tcUi.account;
-  if (!wallet?.address) { alert('Connect your wallet first'); return; }
-  try {
-    const data = await api('/api/referral/withdraw', {
-      method: 'POST',
-      body: JSON.stringify({ walletAddress: wallet.address })
-    });
-    alert(`✅ Withdrawn ${data.amountTon} TON`);
-    loadReferralFromBackend();
-  } catch (e) {
-    alert('❌ Withdraw failed: ' + (e?.message || e));
-  }
+    const wallet = tcUi.account;
+    if (!wallet?.address) { alert('Connect your wallet first'); return; }
+    try {
+        const data = await api('/api/referral/withdraw', {
+            method: 'POST',
+            body: JSON.stringify({ walletAddress: wallet.address, ref: getRefFromUrl() })
+        });
+        alert(`✅ Withdrawn ${data.amountTon.toFixed(2)} GRAM to your wallet`);
+        loadReferralFromBackend();
+    } catch (e) {
+        alert('❌ Withdraw failed: ' + (e?.message || e));
+    }
+
 }
 
   async function copyReferral() {
@@ -895,6 +1019,55 @@ async function mintNumber() {
     resize();
     step();
   })();
+
+async function loadMainPage() {
+    const wallet = getCurrentWalletAddress();
+
+    // TOP
+    try {
+        const data = await api(`/api/stats/top${wallet ? '?wallet=' + encodeURIComponent(wallet) : ''}`, { method: 'GET' });
+        const topEl = document.getElementById('topList');
+        topEl.innerHTML = (data.top || []).map(r => `
+            <div class="rank-row">
+                <span class="rank-num">#${r.rank}</span>
+                <span class="rank-val mono">${r.walletShort}</span>
+                <span class="rank-sub">${r.count} 🔢</span>
+            </div>
+        `).join('');
+        const myRankEl = document.getElementById('myRankRow');
+        if (data.myRank && data.myRank.rank > 10) {
+            myRankEl.innerHTML = `<div class="rank-row my-rank">
+                <span class="rank-num">#${data.myRank.rank}</span>
+                <span class="rank-val mono">You</span>
+                <span class="rank-sub">${data.myRank.count} 🔢</span>
+            </div>`;
+        }
+    } catch (e) { console.log('top error', e); }
+
+    // BEAUTIFUL
+    try {
+        const data = await api('/api/stats/beautiful', { method: 'GET' });
+        document.getElementById('beautifulList').innerHTML = (data.top || []).map((r, i) => `
+            <div class="rank-row">
+                <span class="rank-num">#${i + 1}</span>
+                <span class="rank-val mono" style="font-size:10px">${r.formatted}</span>
+            </div>
+        `).join('');
+    } catch (e) { console.log('beautiful error', e); }
+
+    // EXPENSIVE
+    try {
+        const data = await api('/api/stats/expensive', { method: 'GET' });
+        document.getElementById('expensiveList').innerHTML = (data.top || []).map((r, i) => `
+            <a class="rank-row" href="${r.getgemsUrl}" target="_blank" rel="noreferrer" style="text-decoration:none;color:inherit">
+                <span class="rank-num">#${i + 1}</span>
+                <span class="rank-val mono" style="font-size:10px">${r.name}</span>
+                <span class="rank-sub">${r.priceTon.toFixed(1)}💎</span>
+            </a>
+        `).join('') || '<div class="ref-empty" style="font-size:11px">No listings yet</div>';
+    } catch (e) { console.log('expensive error', e); }
+}
+
 </script>
 </body>
 </html>

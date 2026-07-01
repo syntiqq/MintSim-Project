@@ -13,25 +13,14 @@ model Mint {
   id            String   @id @default(cuid())
   tgId          String
   walletAddress String
-
-  // "phone number" that will be minted
   number        String
-
-  // one-time text comment the user must include in their payment tx —
-  // this is how the backend matches an incoming on-chain payment to this order
   comment       String   @unique
-
-  // required payment, in nanoTON (nanoGRAM)
   amountNano    String
-
-  // status: awaiting_payment -> paid -> confirmed   (or mint_failed)
   status        String   @default("awaiting_payment")
-
-  txHash        String?  // payment tx hash
-  metaUri       String?  // Pinata metadata URL, once uploaded
-  nftIndex      String?  // index assigned on-chain
-  nftAddress    String?  // deployed NftItem address
-
+  txHash        String?
+  metaUri       String?
+  nftIndex      String?
+  nftAddress    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -39,21 +28,22 @@ model Mint {
   @@index([walletAddress, createdAt])
   @@index([status])
 }
-model User {
-  tgId          String   @id
-  referredBy    String?
-  createdAt     DateTime @default(now())
+
+model Referral {
+  wallet      String   @id    // кошелёк реферала
+  referredBy  String          // кошелёк того, кто пригласил
+  createdAt   DateTime @default(now())
 
   @@index([referredBy])
 }
 
 model Withdrawal {
   id          String   @id @default(cuid())
-  tgId        String
+  wallet      String          // кошелёк того, кто выводит
   amountNano  String
-  status      String   @default("pending") // pending -> sent -> failed
+  status      String   @default("pending")
   txHash      String?
   createdAt   DateTime @default(now())
 
-  @@index([tgId])
+  @@index([wallet, status])
 }
