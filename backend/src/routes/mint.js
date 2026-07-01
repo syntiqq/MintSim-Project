@@ -5,8 +5,6 @@ const { renderCardPng } = require('../utils/cardImage');
 const { generateNumber } = require('../utils/generateNumber');
 const rateLimit = require('express-rate-limit');
 const orderLimiter = rateLimit({ windowMs: 60_000, max: 5 });
-const rateLimit = require('express-rate-limit');
-const orderLimiter = rateLimit({ windowMs: 60_000, max: 5 });
 
 let prisma = null;
 try { ({ prisma } = require('../db')); } catch {}
