@@ -596,7 +596,8 @@
 
   function getWalletAddress() {
     const acc = tcUi.account;
-    return acc?.address || '';
+    if (!acc?.address) return '';
+    return TON_CONNECT_UI.toUserFriendlyAddress(acc.address);
   }
 
   tcUi.onStatusChange(() => {
