@@ -4,14 +4,17 @@ const router = express.Router();
 let prisma = null;
 try { ({ prisma } = require('../db')); } catch {}
 
+const { mintNft } = require('../services/mintOnChain');
+
 function checkAdmin(req, res, next) {
     const secret = req.headers['x-admin-secret'];
     if (!secret || secret !== process.env.ADMIN_SECRET) {
-        return res.status(403).json({ ok: false, error: 'forbidden', detail: 'incorrect password' });
+        return res.status(403).json({ ok: false, error: 'forbidden', detail: 'wrong password' });
     }
     next();
 }
-//stats
+
+
 router.get('/stats', checkAdmin, async (req, res) => {
     try {
         const totalMints = await prisma.mint.count();
@@ -35,12 +38,27 @@ router.get('/stats', checkAdmin, async (req, res) => {
     }
 });
 
+
 router.post('/custom-mint', checkAdmin, async (req, res) => {
     try {
         const { walletAddress, number } = req.body;
         if (!walletAddress || !number) {
-            return res.status(400).json({ ok: false, error: 'wallet and address' });
+            return res.status(400).json({ ok: false, error: 'wallet and number are needed' });
         }
+
+        console.log(`[ADMIN MINT] push mint number ${number}`);
+
+
+        const backendUrl = process.env.BACKEND_PUBLIC_URL || 'https://api.mintsim.uk';
+        const metaUri = `${backendUrl}/api/mint/meta/${number}`;
+
+        const blockchainResult = await mintNft({ 
+            ownerAddress: walletAddress, 
+            metaUri: metaUri 
+        });
+
+        console.log('[ADMIN MINT] approve mint:', blockchainResult);
+
 
         const rec = await prisma.mint.create({
             data: {
@@ -48,16 +66,23 @@ router.post('/custom-mint', checkAdmin, async (req, res) => {
                 walletAddress,
                 number: String(number),
                 comment: 'admin-mint-' + Date.now(),
-                amountNano: '0',
+                amountNano: '0', 
                 status: 'confirmed',
+                nftIndex: String(blockchainResult.index),
+                nftAddress: blockchainResult.nftAddress
             }
         });
-        const { mintNft } = require('./referral');
-        await mintNft({ ownerAddress: walletAddress, metaUri: '...' });
 
-        res.json({ ok: true, message: `number ${number} is yours ${walletAddress}`, record: rec });
+        res.json({ 
+            ok: true, 
+            message: `Номер ${number} nice!`, 
+            blockchain: blockchainResult,
+            record: rec 
+        });
+
     } catch (e) {
-        res.status(500).json({ ok: false, error: e.message });
+        console.error('[ADMIN MINT] error:', e.message);
+        res.status(500).json({ ok: false, error: 'blockchain_error', detail: e.message });
     }
 });
 

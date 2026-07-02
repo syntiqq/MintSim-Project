@@ -51,18 +51,24 @@
             const wallet = document.getElementById('targetWallet').value;
             const number = document.getElementById('targetNumber').value;
             
-            document.getElementById('mintOutput').innerText = 'sending...';
+            const outputEl = document.getElementById('mintOutput');
+            outputEl.innerText = 'sending... (waiting mint)';
             
-            const res = await fetch(`${baseUrl}/custom-mint`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'x-admin-secret': secret 
-                },
-                body: JSON.stringify({ walletAddress: wallet, number: number })
-            });
-            const data = await res.json();
-            document.getElementById('mintOutput').innerText = JSON.stringify(data, null, 2);
+            try {
+                const res = await fetch(`${baseUrl}/custom-mint`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-admin-secret': secret 
+                    },
+                    body: JSON.stringify({ walletAddress: wallet, number: number })
+                });
+                
+                const data = await res.json();
+                outputEl.innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                outputEl.innerText = 'error request: ' + err.message;
+            }
         }
     </script>
 </body>
