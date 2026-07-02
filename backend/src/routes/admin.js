@@ -6,10 +6,37 @@ try { ({ prisma } = require('../db')); } catch {}
 
 const { mintNft } = require('../services/mintOnChain');
 
-// Помощник: превращает BigInt в обычные строки, чтобы JSON не ломался
+// Помощник: превращает BigInt в обычные строки
 const safeJson = (data) => JSON.parse(JSON.stringify(data, (key, value) =>
     typeof value === 'bigint' ? value.toString() : value
 ));
+
+// Функция для красивого формата: из 99999999 делает +999 99 999 999
+function formatMintNumber(rawNumber) {
+    let clean = String(rawNumber).replace(/\D/g, ''); 
+    if (clean.startsWith('999') && clean.length > 8) {
+        clean = clean.slice(3);
+    }
+    if (clean.length === 8) {
+        clean = `${clean.slice(0, 2)} ${clean.slice(2, 5)} ${clean.slice(5)}`;
+    }
+    return `+999 ${clean}`;
+}
+
+// НОВЫЙ РОУТ: Специальная мета для админских NFT (не трогает основной сайт)
+router.get('/meta/:number', (req, res) => {
+    const rawNumber = req.params.number;
+    const formattedName = formatMintNumber(rawNumber);
+    const backendUrl = process.env.BACKEND_PUBLIC_URL || 'https://api.mintsim.uk';
+    
+    res.json({
+        name: formattedName, // Имя с пробелами и +999
+        description: 'Anonymous number NFT',
+        // Прямая ссылка на твой рабочий генератор картинок!
+        image: `${backendUrl}/api/mint/card/${rawNumber}.png`, 
+        attributes: [{ trait_type: 'number', value: formattedName }]
+    });
+});
 
 function checkAdmin(req, res, next) {
     const secret = req.headers['x-admin-secret'];
@@ -19,7 +46,7 @@ function checkAdmin(req, res, next) {
     next();
 }
 
-// 1. Статистика (с понятными названиями)
+// 1. Статистика
 router.get('/stats', checkAdmin, async (req, res) => {
     try {
         const totalMints = await prisma.mint.count();
@@ -43,7 +70,7 @@ router.get('/stats', checkAdmin, async (req, res) => {
     }
 });
 
-// 2. Минт (с фиксом BigInt)
+// 2. Минт (теперь использует админскую мету)
 router.post('/custom-mint', checkAdmin, async (req, res) => {
     try {
         const { walletAddress, number } = req.body;
@@ -54,9 +81,9 @@ router.post('/custom-mint', checkAdmin, async (req, res) => {
         console.log(`[ADMIN MINT] Запуск минта для номера ${number}`);
 
         const backendUrl = process.env.BACKEND_PUBLIC_URL || 'https://api.mintsim.uk';
-        const metaUri = `${backendUrl}/api/mint/meta/${number}`;
+        // ВАЖНО: Теперь админка берет мету из СВОЕГО роута, а не с основного сайта
+        const metaUri = `${backendUrl}/api/admin/meta/${number}`;
 
-        // Вызываем блокчейн
         const blockchainResult = await mintNft({ 
             ownerAddress: walletAddress, 
             metaUri: metaUri 
@@ -64,7 +91,6 @@ router.post('/custom-mint', checkAdmin, async (req, res) => {
 
         console.log('[ADMIN MINT] Блокчейн подтвердил минт:', safeJson(blockchainResult));
 
-        // Записываем в базу
         const rec = await prisma.mint.create({
             data: {
                 tgId: 'admin',
@@ -78,7 +104,6 @@ router.post('/custom-mint', checkAdmin, async (req, res) => {
             }
         });
 
-        // Отдаем ответ, пропустив blockchainResult через safeJson
         res.json({ 
             ok: true, 
             message: `✅ Номер ${number} успешно отправлен в блокчейн!`, 
