@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель управления</title>
+    <style>
+        body { font-family: monospace; background: #111; color: #0f0; padding: 20px; }
+        input, button { background: #222; border: 1px solid #0f0; color: #0f0; padding: 10px; margin: 5px 0; width: 300px; display: block; }
+        button { cursor: pointer; font-weight: bold; }
+        button:hover { background: #0f0; color: #111; }
+        .box { border: 1px dashed #0f0; padding: 15px; margin-bottom: 20px; width: 320px; }
+    </style>
+</head>
+<body>
+
+    <h2>Управление MintSim</h2>
+    
+    <div class="box">
+        <label>Секретный ключ (из .env):</label>
+        <input type="password" id="secretKey" placeholder="Введите ADMIN_SECRET">
+    </div>
+
+    <div class="box">
+        <h3>📊 Статистика</h3>
+        <button onclick="loadStats()">Обновить стату</button>
+        <pre id="statsOutput">Жду данных...</pre>
+    </div>
+
+    <div class="box">
+        <h3>💎 Выдать красивый номер</h3>
+        <input type="text" id="targetWallet" placeholder="TON Кошелек получателя">
+        <input type="text" id="targetNumber" placeholder="Номер (например 77777777)">
+        <button onclick="customMint()">Сминтить бесплатно</button>
+        <pre id="mintOutput"></pre>
+    </div>
+
+    <script>
+        const baseUrl = '/api/admin'; // Если тестишь локально, добавь http://localhost:4000
+
+        async function loadStats() {
+            const secret = document.getElementById('secretKey').value;
+            const res = await fetch(`${baseUrl}/stats`, {
+                headers: { 'x-admin-secret': secret }
+            });
+            const data = await res.json();
+            document.getElementById('statsOutput').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function customMint() {
+            const secret = document.getElementById('secretKey').value;
+            const wallet = document.getElementById('targetWallet').value;
+            const number = document.getElementById('targetNumber').value;
+            
+            document.getElementById('mintOutput').innerText = 'Отправляю...';
+            
+            const res = await fetch(`${baseUrl}/custom-mint`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-admin-secret': secret 
+                },
+                body: JSON.stringify({ walletAddress: wallet, number: number })
+            });
+            const data = await res.json();
+            document.getElementById('mintOutput').innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>

@@ -49,6 +49,7 @@ app.use('/api/numbers', require('./routes/numbers'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/referral', require('./routes/referral'));
 app.use('/api/stats', require('./routes/stats'));
+app.use('/api/admin', require('./routes/admin'));
 
 // HEALTH (used by Railway's healthcheck)
 app.get('/health', (_req, res) => res.json({ ok: true }));
