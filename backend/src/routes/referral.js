@@ -4,7 +4,7 @@ const router = express.Router();
 let prisma = null;
 try { ({ prisma } = require('../db')); } catch {}
 
-const REWARD_PER_MINT_NANO = BigInt(Math.round(0.00001 * 1e9)); // 0.5 TON 
+const REWARD_PER_MINT_NANO = BigInt(Math.round(0.01 * 1e9)); // 0.5 TON 
 
 const { Address } = require('@ton/core');
 
