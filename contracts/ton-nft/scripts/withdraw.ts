@@ -36,14 +36,16 @@ export async function run(provider: NetworkProvider, args: string[]) {
         return;
     }
 
+    const destinationStr = args[1] ?? await ui.input('Destination wallet address (where to send TON)');
+
     await collection.send(
         provider.sender(),
         { value: toNano('0.02') },
         {
             $$type: 'Withdraw',
             amount: amountToWithdraw,
+            destination: Address.parse(destinationStr),
         },
     );
-
     console.log('✅ Withdraw message sent. Check your wallet balance in ~10-20 sec.');
 }

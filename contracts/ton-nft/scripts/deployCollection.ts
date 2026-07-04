@@ -2,17 +2,7 @@ import { beginCell, toNano } from '@ton/core';
 import { Collection }          from '../build/Collection/Collection_Collection';
 import { NetworkProvider }     from '@ton/blueprint';
 
-/**
- * BEFORE RUNNING THIS:
- *   1. Upload a `collection.json` file to Pinata (manually, via pinata.cloud
- *      dashboard) describing the whole collection, e.g.:
- *        { "name": "Anonymous Numbers", "description": "...", "image": "https://..." }
- *   2. Copy the resulting URL (gateway URL or ipfs://CID) — you'll be asked
- *      for it below.
- *
- * RUN:
- *   npx blueprint run deployCollection --network mainnet
- */
+
 export async function run(provider: NetworkProvider, args: string[]) {
     const ui = provider.ui();
 
