@@ -8,11 +8,7 @@ npx blueprint run deployCollection --mainnet
  Введи URI метаданных коллекции (тот же Pinata URL что и раньше, или новый если хочешь обновить). Получишь новый адрес коллекции — сохрани его
 
 4 — Обнови переменные в RailwayВ Railway дашборде → твой backend сервис → Variables. Меняй именно там, не в файлах:DEPLOYER_MNEMONIC=<новые 24 слова через пробел>
-GETGEMS_COLLECTION=<новый адрес контракта>Шаг 5 — Файлы которые надо поменятьfrontend/index.html — в секции page-apps найди ссылку на Getgems и замени адрес коллекции:html<!-- найди эту строку -->
-<a class="app-row" href="https://getgems.io/collection/EQBU2gRGubbxHOe_WcEmReoAIB44U4RGLQ0VSvNbGyrDX2jo" ...>
-
-<!-- замени адрес на новый -->
-<a class="app-row" href="https://getgems.io/collection/<НОВЫЙ_АДРЕС>" ...>frontend/index.html — если где-то хардкодом вшит адрес коллекции в JS, найди через Ctrl+F по старому адресу и замени. Судя по коду, адрес коллекции приходит с бэка (order.collectionAddress) в ответе на /api/mint/order — значит фронт сам его не знает, менять только в ссылке Apps.backend/jobs/PaymentWatcher.js — адрес коллекции берётся из process.env.GETGEMS_COLLECTION, значит сам файл менять не нужно, только переменную в Railway.backend/src/services/mintOnChain.js — то же самое, адрес из process.env.GETGEMS_COLLECTION.Шаг 6 — Очисти старые заказы в базе (опционально)Если хочешь начать счётчик минтов с нуля — в Railway через Prisma Studio или скриптом:cd backend && node -e "const {PrismaClient}=require('@prisma/client');const p=new PrismaClient();p.mint.deleteMany({}).then(r=>console.log('deleted',r.count)).finally(()=>p.$disconnect())"Шаг 7 — Создай новую коллекцию на GetgemsПосле деплоя нового контракта — зайди на getgems.io, подключи новый кошелёк (тот который стал owner), и создай коллекцию по новому адресу. Старая коллекция останется на старом адресе и просто перестанет обновляться.
+GETGEMS_COLLECTION=<новый адрес контракта>
 contracts/ton-nft/metadata/collection.js image
 
 /**

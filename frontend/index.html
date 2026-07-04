@@ -443,7 +443,7 @@
               <span class="ref-stat-value" id="refReward">0 GRAM</span>
             </div>
             <div class="ref-stat">
-              <span class="ref-stat-label">Total earned</span>
+              <span class="ref-stat-label">Available to withdraw</span>
               <span class="ref-stat-value" id="refEarned">0 GRAM</span>
             </div>
           </div>
@@ -810,7 +810,7 @@ async function mintNumber() {
     try {
         const data = await api(`/api/referral/me?wallet=${encodeURIComponent(wallet)}`, { method: 'GET' });
         document.getElementById('refReward').textContent = (data.rewardPerMint || 0.5) + ' GRAM';
-        document.getElementById('refEarned').textContent = (data.totalEarned || 0).toFixed(2) + ' GRAM';
+        document.getElementById('refEarned').textContent = (data.totalAvailable || 0).toFixed(2) + ' GRAM';
         if (data.totalAvailable > 0) {
             document.getElementById('withdrawBtn').style.display = 'block';
         }
