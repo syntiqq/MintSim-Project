@@ -54,19 +54,14 @@ async function mintNft({ ownerAddress, metaUri }) {
 
     const collectionAddr = Address.parse(process.env.GETGEMS_COLLECTION);
     const index  = await getNextItemIndex();
+    const opcode = getOpcode('Mint');
 
-    // 1. Формируем "начинку" самого NFT
-    const nftItemContent = beginCell()
-        .storeAddress(Address.parse(ownerAddress))
-        .storeRef(offchainContentCell(metaUri))
-        .endCell();
-
-    // 2. Формируем главный приказ для коллекции (УБРАЛИ QUERY_ID!)
     const body = beginCell()
-        .storeUint(1, 32)                                  // OpCode = 1
-        .storeUint(index, 64)                              // СРАЗУ передаем индекс (без queryId)
-        .storeCoins(toNano('0.03'))                        // Копеечка (gas) для самого NFT
-        .storeRef(nftItemContent)                          // Вкладываем начинку
+        .storeUint(opcode, 32)
+        .storeUint(BigInt(Date.now()) % (2n ** 64n), 64)   // queryId
+        .storeUint(index, 64)                               // index
+        .storeAddress(Address.parse(ownerAddress))           // owner
+        .storeRef(offchainContentCell(metaUri))               // content
         .endCell();
 
     const seqno = await opened.getSeqno();
@@ -93,7 +88,7 @@ async function mintNft({ ownerAddress, metaUri }) {
 
     let indexAfter = await getNextItemIndex();
     let checkAttempts = 0;
-    while (indexAfter <= index && checkAttempts < 5) {
+    while (indexAfter <= index && checkAttempts < 20) {
         await new Promise(r => setTimeout(r, 3000));
         indexAfter = await getNextItemIndex();
         checkAttempts++;
