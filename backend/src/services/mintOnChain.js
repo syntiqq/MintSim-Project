@@ -54,15 +54,25 @@ async function mintNft({ ownerAddress, metaUri }) {
 
     const collectionAddr = Address.parse(process.env.GETGEMS_COLLECTION);
     const index  = await getNextItemIndex();
-    const opcode = getOpcode('Mint');
 
-    const body = beginCell()
-        .storeUint(opcode, 32)
-        .storeUint(BigInt(Date.now()) % (2n ** 64n), 64)   // queryId
-        .storeUint(index, 64)                               // index
-        .storeAddress(Address.parse(ownerAddress))           // owner
-        .storeRef(offchainContentCell(metaUri))               // content
+    // --- НОВЫЙ КОД ПОД СТАНДАРТЫ GETGEMS ---
+    
+    // 1. Формируем "начинку" самого NFT: кому принадлежит и где лежат картинки
+    const nftItemContent = beginCell()
+        .storeAddress(Address.parse(ownerAddress))
+        .storeRef(offchainContentCell(metaUri))
         .endCell();
+
+    // 2. Формируем главный приказ для коллекции
+    const body = beginCell()
+        .storeUint(1, 32)                                  // OpCode = 1 (Стандартная команда "Mint" в GetGems)
+        .storeUint(BigInt(Date.now()) % (2n ** 64n), 64)   // queryId
+        .storeUint(index, 64)                              // Порядковый номер (index)
+        .storeCoins(toNano('0.03'))                        // Копеечка (forward amount), которая ляжет на баланс самого NFT
+        .storeRef(nftItemContent)                          // Вкладываем начинку
+        .endCell();
+
+    // ----------------------------------------
 
     const seqno = await opened.getSeqno();
 
