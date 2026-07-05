@@ -8,7 +8,7 @@ const app = express();
 
 // CORS
 const EXTRA_ORIGIN = process.env.ALLOWED_ORIGIN;
-const ADMIN_ORIGIN = 'https://mint-sim-project.vercel.app';
+const ADMIN_ORIGIN = 'https://mint-sim-project-xi.vercel.app';
 
 function isAllowedOrigin(origin) {
     if (!origin) return true;
