@@ -13,9 +13,11 @@ const ADMIN_ORIGIN = 'https://mint-sim-project-xi.vercel.app';
 function isAllowedOrigin(origin) {
     if (!origin) return true;
     if (origin.includes('localhost')) return true;
-    if (origin === 'https://mintsim.uk' || origin === 'https://www.mintsim.uk') return true;
+    if (origin === 'https://mintsim.uk') return true;
+    if (origin === 'https://www.mintsim.uk') return true;
+    if (origin === 'https://mint-sim-project-xi.vercel.app') return true;
+    if (origin.endsWith('.vercel.app') && origin.includes('mint-sim')) return true;
     if (EXTRA_ORIGIN && origin === EXTRA_ORIGIN) return true;
-    if (origin === ADMIN_ORIGIN) return true;
     return false;
 }
 
