@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 });
 
 app.disable('x-powered-by');
-app.set('trust proxy', 1);
+app.set('trust proxy', true);
 
 app.use(express.json({ limit: '100kb' })); // было 10mb
 app.use(morgan('dev'));
