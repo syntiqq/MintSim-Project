@@ -40,7 +40,7 @@ router.get('/:wallet', async (req, res) => {
         res.json({ ok: true, numbers });
     } catch (e) {
         console.error('numbers error:', e.message);
-        res.status(500).json({ ok: false, error: 'internal', detail: e.message });
+        res.status(500).json({ ok: false, error: 'internal'});
     }
 });
 

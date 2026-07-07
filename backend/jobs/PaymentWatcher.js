@@ -47,10 +47,10 @@ async function checkPayments(prisma) {
         console.error('PaymentWatcher: could not fetch transactions:', e.message);
         return;
     }
-console.log('PaymentWatcher: transactions received —', txs.length);
-if (txs.length > 0) {
-    console.log('PaymentWatcher: example in_msg —', JSON.stringify(txs[0].in_msg));
-}
+//console.log('PaymentWatcher: transactions received —', txs.length);
+//if (txs.length > 0) {
+//   console.log('PaymentWatcher: example in_msg —', JSON.stringify(txs[0].in_msg));
+//}
 
     for (const order of pending) {
         const match = txs.find(tx => decodeComment(tx) === order.comment);

@@ -5,9 +5,9 @@ const morgan  = require('morgan');
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
 const app = express();
-
+//cors
 const EXTRA_ORIGIN = process.env.ALLOWED_ORIGIN;
-const ADMIN_ORIGIN = 'https://mint-sim-project-xi.vercel.app';
+const ADMIN_ORIGIN = process.env.ADMIN_ORIGIN;
 
 function isAllowedOrigin(origin) {
     if (!origin) return true;
@@ -31,23 +31,8 @@ app.use((req, res, next) => {
     if (req.method === 'OPTIONS') return res.sendStatus(200);
     next();
 });
-
-app.use(require('helmet')());
-
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (isAllowedOrigin(origin)) {
-        res.header('Access-Control-Allow-Origin', origin || '*');
-    }
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-tg-id, x-admin-secret');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-    res.header('Vary', 'Origin');
-    if (req.method === 'OPTIONS') return res.sendStatus(200);
-    next();
-});
-
 app.disable('x-powered-by');
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 app.use(express.json({ limit: '100kb' }));
 app.use(morgan('dev'));

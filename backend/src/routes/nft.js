@@ -15,7 +15,7 @@ router.get('/check/:wallet', async (req, res) => {
         const data = await response.json();
         res.json({ ok: true, nfts: data.nft_items || [] });
     } catch (e) {
-        res.status(500).json({ ok: false, error: e.message });
+        res.status(500).json({ ok: false, error: 'internal'});
     }
 });
 

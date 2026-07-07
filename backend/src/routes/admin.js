@@ -62,7 +62,7 @@ router.get('/stats', checkAdmin, async (req, res) => {
             }
         });
     } catch (e) {
-        res.status(500).json({ ok: false, error: e.message });
+        res.status(500).json({ ok: false, error: 'internal'});
     }
 });
 
