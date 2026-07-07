@@ -9,9 +9,7 @@ import { beginCell } from '@ton/core';
 import { useState, useRef } from 'react';
 import { createOrder, getOrderStatus } from './api.js';
 
-const MANIFEST_URL = import.meta.env.VITE_MANIFEST_URL ||
-    'https://mintsim.uk/manifest-v2.json';
-
+const MANIFEST_URL = 'https://raw.githubusercontent.com/syntiqq/MintSim-Project/refs/heads/main/frontend/public/tg-manifest.json'
 const PRICE_LABEL = `${import.meta.env.VITE_MINT_PRICE_TON || 5} Gram (TON)`;
 
 
