@@ -2,7 +2,6 @@ import { beginCell, toNano } from '@ton/core';
 import { Collection }          from '../build/Collection/Collection_Collection';
 import { NetworkProvider }     from '@ton/blueprint';
 
-
 export async function run(provider: NetworkProvider, args: string[]) {
     const ui = provider.ui();
 
@@ -12,9 +11,17 @@ export async function run(provider: NetworkProvider, args: string[]) {
         .storeUint(0x01, 8)            // TEP-64 off-chain tag
         .storeStringTail(metadataUri)
         .endCell();
+    const royaltyParams = {
+        $$type: 'RoyaltyParams' as const,
+        numerator: 5n, 
+        denominator: 100n,                
+        destination: provider.sender().address! 
+    };
 
+
+   
     const collection = provider.open(
-        await Collection.fromInit(provider.sender().address!, collectionContent)
+        await Collection.fromInit(provider.sender().address!, collectionContent, royaltyParams)
     );
 
     console.log('Deploying Collection to:', collection.address.toString());
