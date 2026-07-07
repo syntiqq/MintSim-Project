@@ -1,5 +1,6 @@
 {
   "url": "https://mintsim.uk",
   "name": "Number NFT Mint",
-  "iconUrl": "https://mintsim.uk/icon.png"
+  "iconUrl": "https://mintsim.uk/icon.png",
+  "description": "Mint your own NFT numbers on TON blockchain"
 }
