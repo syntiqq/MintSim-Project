@@ -2,14 +2,6 @@ import { Address, beginCell, toNano } from '@ton/core';
 import { Collection }                  from '../build/Collection/Collection_Collection';
 import { NetworkProvider }             from '@ton/blueprint';
 
-/**
- * Manual / debug mint — mints one NFT directly from the CLI using whatever
- * wallet you connect. In production the BACKEND does this automatically
- * (see backend/src/services/mintOnChain.js) after confirming payment.
- *
- * RUN:
- *   npx blueprint run mintNft --network mainnet <collectionAddress> <recipientAddress> <metaUri>
- */
 export async function run(provider: NetworkProvider, args: string[]) {
     const ui = provider.ui();
 

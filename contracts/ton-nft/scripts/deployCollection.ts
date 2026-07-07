@@ -21,7 +21,7 @@ export async function run(provider: NetworkProvider, args: string[]) {
 
     await collection.send(
         provider.sender(),
-        { value: toNano('0.15') },   // enough for mainnet deploy + storage
+        { value: toNano('0.15') },   // enough for mainnet deploy
         null,
     );
 
@@ -30,8 +30,4 @@ export async function run(provider: NetworkProvider, args: string[]) {
     console.log('✅ Collection deployed at:', collection.address.toString());
     console.log('   Next item index:',        await collection.getNextItemIndex());
     console.log('   Owner:',                  (await collection.getOwner()).toString());
-    console.log('\n→ Put this address into:');
-    console.log('   backend/.env  → GETGEMS_COLLECTION');
-    console.log('   frontend/.env → VITE_COLLECTION_ADDRESS');
-    console.log('\n→ Also copy build/Collection/Collection_Collection.abi to backend/abi/Collection.abi.json');
 }

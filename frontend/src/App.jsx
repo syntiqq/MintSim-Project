@@ -10,13 +10,11 @@ import { useState, useRef } from 'react';
 import { createOrder, getOrderStatus } from './api.js';
 
 const MANIFEST_URL = import.meta.env.VITE_MANIFEST_URL ||
-    'https://CHANGE-ME.vercel.app/tonconnect-manifest.json';
+    'https://mintsim.uk/tonconnect-manifest.json';
 
 const PRICE_LABEL = `${import.meta.env.VITE_MINT_PRICE_TON || 5} Gram (TON)`;
 
-// ─── Build a plain "comment" payload — no opcode needed, the contract
-//     just needs to accept the transfer; the backend reads the comment
-//     via TonAPI to match it to the order. ──────────────────────────────────
+
 function buildCommentPayload(comment) {
     return beginCell()
         .storeUint(0, 32)            // text-comment opcode
@@ -39,19 +37,16 @@ function InnerApp() {
     }
 
     async function mint() {
-        if (!wallet) { alert('Сначала подключи кошелёк'); return; }
+        if (!wallet) { alert('connect the wallet'); return; }
         setLoading(true);
-        setStatus('Создаём заказ…');
+        setStatus('creating an order...');
         setResult(null);
 
         try {
             const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'dev-user';
-
-            // Step 1 — backend creates a pending order
             const order = await createOrder({ tgId, walletAddress: wallet.account.address });
 
-            // Step 2 — send a plain payment with the order's comment
-            setStatus(`Подтверди оплату ${order.amountTon} Gram (TON) в кошельке…`);
+            setStatus(`confirm the payment ${order.amountTon} Gram (TON) in wallet…`);
             const payload = buildCommentPayload(order.comment);
 
             await tonConnectUI.sendTransaction({
@@ -63,24 +58,23 @@ function InnerApp() {
                 }]
             });
 
-            setStatus('Оплата отправлена. Ждём подтверждения сети и минт…');
+            setStatus('The payment has been sent. We are waiting for the confirmation of the network and mint…');
 
-            // Step 3 — poll backend until status becomes "confirmed"
             pollRef.current = setInterval(async () => {
                 try {
                     const { order: o } = await getOrderStatus(order.orderId);
 
                     if (o.status === 'paid') {
-                        setStatus('Оплата найдена в блокчейне. Загружаем метаданные и минтим NFT…');
+                        setStatus('The payment was found. Mint the NFT…');
                     } else if (o.status === 'confirmed') {
                         stopPolling();
                         setLoading(false);
-                        setStatus('✅ Готово!');
+                        setStatus('✅ Done!');
                         setResult(o);
                     } else if (o.status === 'mint_failed') {
                         stopPolling();
                         setLoading(false);
-                        setStatus('❌ Минт не удался. Напиши в поддержку — оплата сохранена в заказе.');
+                        setStatus('❌ The mint failed. Write to support — the payment is saved in the order..');
                     }
                 } catch (e) {
                     console.error('poll error:', e);
@@ -89,15 +83,15 @@ function InnerApp() {
 
         } catch (e) {
             console.error('MINT ERROR:', e);
-            setStatus('❌ ' + (e.message || 'Неизвестная ошибка'));
+            setStatus('❌ ' + (e.message || 'unknown error'));
             setLoading(false);
         }
     }
 
     return (
         <div style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 480, margin: '0 auto' }}>
-            <h1 style={{ fontSize: 24 }}>Mint your number NFT</h1>
-            <p style={{ color: '#666' }}>Цена минта: {PRICE_LABEL}</p>
+            <h1 style={{ fontSize: 24 }}>Mint your NFT number</h1>
+            <p style={{ color: '#666' }}>Mint Price: {PRICE_LABEL}</p>
 
             <TonConnectButton />
             <br />
@@ -112,20 +106,20 @@ function InnerApp() {
                     cursor: wallet && !loading ? 'pointer' : 'not-allowed',
                 }}
             >
-                {loading ? 'Обработка…' : `Mint NFT (${PRICE_LABEL})`}
+                {loading ? 'processing…' : `Mint NFT (${PRICE_LABEL})`}
             </button>
 
             {status && <p style={{ marginTop: 16, whiteSpace: 'pre-wrap' }}>{status}</p>}
 
             {result && (
                 <div style={{ marginTop: 16, padding: 12, border: '1px solid #ddd', borderRadius: 8 }}>
-                    <strong>Номер: {result.number}</strong>
-                    <div>NFT адрес: {result.nftAddress}</div>
+                    <strong>Number: {result.number}</strong>
+                    <div>NFT address: {result.nftAddress}</div>
                     <a
                         href={`https://getgems.io/nft/${result.nftAddress}`}
                         target="_blank" rel="noreferrer"
                     >
-                        Открыть в GetGems →
+                        Open in Getgems.io →
                     </a>
                 </div>
             )}

@@ -105,7 +105,7 @@ async function mintNft({ ownerAddress, metaUri }) {
     return { index, nftAddress: nftAddress.toString() };
 }
 
-/** Sends a plain TON transfer from the admin wallet — used for referral reward withdrawals. */
+//referral
 async function sendTon({ toAddress, amountNano }) {
     const { keys, wallet } = await adminWallet();
     const tonClient = client();

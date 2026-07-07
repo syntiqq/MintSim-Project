@@ -13,10 +13,6 @@ async function apiFetch(url, options = {}) {
     return data;
 }
 
-/**
- * Step 1: create a pending order.
- * Returns { orderId, number, comment, amountNano, amountTon, collectionAddress }
- */
 export async function createOrder({ tgId, walletAddress }) {
     return apiFetch(`${API_BASE}/api/mint/order`, {
         method: 'POST',
@@ -25,10 +21,7 @@ export async function createOrder({ tgId, walletAddress }) {
     });
 }
 
-/**
- * Step 2 (after frontend sends the on-chain payment): poll order status.
- * status: awaiting_payment -> paid -> confirmed (or mint_failed)
- */
+
 export async function getOrderStatus(orderId) {
     return apiFetch(`${API_BASE}/api/mint/order/${orderId}`);
 }

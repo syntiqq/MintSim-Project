@@ -3,8 +3,7 @@ import "./nft-item.tact";
 
 // NOTE: MintTransfer is declared in nft-item.tact (imported above) — it's the
 // message Collection sends to a freshly-deployed NftItem to finalize it.
-
-// Admin-only (backend, via DEPLOYER_MNEMONIC): actually creates one NFT.
+// Admin-only actually creates one NFT.
 message Mint {
     queryId: Int as uint64;
     index:   Int as uint64;
@@ -41,7 +40,7 @@ contract Collection with Deployable {
         self.collectionContent = collectionContent;
     }
 
-    // ── Payment intake
+    // Payment intake
     receive(msg: Slice) {
         // accept comment-bearing transfers — handled off-chain by backend
     }
@@ -50,7 +49,7 @@ contract Collection with Deployable {
         // accept plain empty transfers too
     }
 
-    // ── Admin mint (backend-triggered)
+    // Admin mint
     receive(msg: Mint) {
         require(sender() == self.owner, "Only owner can mint");
         require(msg.index == self.nextItemIndex, "Wrong index — out of sync with chain");
@@ -74,7 +73,7 @@ contract Collection with Deployable {
         self.nextItemIndex = self.nextItemIndex + 1;
     }
 
-    // ── Admin withdraw
+    // Admin withdraw
     receive(msg: Withdraw) {
         require(sender() == self.owner, "Only owner can withdraw");
         send(SendParameters{
@@ -85,13 +84,13 @@ contract Collection with Deployable {
         });
     }
 
-    // ── Admin update collection metadata 
+    // Admin update collection metadata 
     receive(msg: UpdateContent) {
         require(sender() == self.owner, "Only owner can update content");
         self.collectionContent = msg.content;
     }
 
-    // ── TEP-62 standard getters
+    // TEP-62 standard getters
     get fun get_collection_data(): CollectionData {
         return CollectionData{
             nextItemIndex:     self.nextItemIndex,

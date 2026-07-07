@@ -33,7 +33,7 @@ function formatNumber(raw) {
 }
 
 // GET /api/stats/top?wallet=<address>
-const { Address } = require('@ton/core'); // <--- ДОБАВЬ ЭТО В НАЧАЛО ФАЙЛА, если еще нет
+const { Address } = require('@ton/core');
 
 // GET /api/stats/top?wallet=<address>
 router.get('/top', async (req, res) => {
@@ -87,7 +87,7 @@ router.get('/top', async (req, res) => {
     }
 });
 
-// GET /api/stats/beautiful
+// GET /api/stats/bea
 router.get('/beautiful', async (req, res) => {
     try {
         if (!prisma?.mint?.findMany) return res.json({ ok: true, top: [] });
@@ -113,7 +113,7 @@ router.get('/beautiful', async (req, res) => {
     }
 });
 
-// GET /api/stats/expensive  
+// GET /api/stats/exp 
 router.get('/expensive', async (req, res) => {
     try {
         const collectionAddr = process.env.GETGEMS_COLLECTION;

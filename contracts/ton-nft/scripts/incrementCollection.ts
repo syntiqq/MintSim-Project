@@ -2,13 +2,7 @@ import { Address, beginCell, toNano } from '@ton/core';
 import { Collection }                  from '../build/Collection/Collection_Collection';
 import { NetworkProvider, sleep }      from '@ton/blueprint';
 
-/**
- * Mints the next NFT and waits until nextItemIndex actually increments
- * on-chain (useful for manual testing on testnet).
- *
- * RUN:
- *   npx blueprint run incrementCollection --network testnet <collectionAddr> <recipientAddr> <metaUri>
- */
+
 export async function run(provider: NetworkProvider, args: string[]) {
     const ui = provider.ui();
 

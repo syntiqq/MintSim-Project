@@ -1,14 +1,6 @@
-// Reads message opcodes straight from the compiled Tact ABI so we never
-// have to hand-copy "magic numbers" into .env files.
-//
-// SETUP (one-time, after every contract rebuild):
-//   1. cd contracts/ton-nft && npx blueprint build
-//   2. cp build/Collection/Collection_Collection.abi backend/abi/Collection.abi.json
-//
-// If this file is missing, or the Tact compiler's ABI shape doesn't match
-// what we expect below, set MINT_OPCODE explicitly in backend/.env as a
-// fallback (open the copied .abi.json, search for "Mint", and copy the
-// numeric "header" value).
+
+//cd contracts/ton-nft && npx blueprint build
+//cp build/Collection/Collection_Collection.abi backend/abi/Collection.abi.json
 
 const fs   = require('fs');
 const path = require('path');
@@ -30,7 +22,6 @@ function loadAbi() {
 }
 
 function getOpcode(messageName) {
-    // Manual override always wins — useful if the ABI shape ever changes.
     if (process.env.MINT_OPCODE && messageName === 'Mint') {
         return Number(process.env.MINT_OPCODE);
     }

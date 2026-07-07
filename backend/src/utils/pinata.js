@@ -1,5 +1,4 @@
-// Pinata (IPFS) upload helpers — used to store NFT metadata & images
-// so the content survives independently of our own server.
+// Pinata 
 const axios     = require('axios');
 const FormData   = require('form-data');
 
@@ -23,7 +22,6 @@ async function pinJson(json, name = 'metadata.json') {
     return { cid, uri: `ipfs://${cid}`, gatewayUrl: `${GATEWAY}${cid}` };
 }
 
-/** Pin a Buffer (e.g. an image) to IPFS via Pinata. */
 async function pinFile(buffer, filename) {
     assertConfigured();
     const form = new FormData();

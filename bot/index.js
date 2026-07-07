@@ -7,19 +7,17 @@ if (!token) { console.error('TELEGRAM_BOT_TOKEN missing'); process.exit(1); }
 
 const bot = new TelegramBot(token, { polling: true });
 
-// Хранилище тикетов и состояний
+
 const tickets = new Map();
 let ticketCounter = 0;
 const adminReplyState = new Map(); // adminChatId -> ticketId
 
-// chat_id админа — сохраняется когда ты пишешь /admin
+//admin
 let ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID ? Number(process.env.ADMIN_CHAT_ID) : null;
 
-// Сохранить admin chat_id в .env (чтобы не терялся при перезапуске)
 function saveAdminId(chatId) {
     ADMIN_CHAT_ID = chatId;
     console.log(`✅ Admin chat_id saved: ${chatId}`);
-    // Можно также сохранить в файл если нужно
     try {
         let env = fs.existsSync('.env') ? fs.readFileSync('.env', 'utf8') : '';
         if (env.includes('ADMIN_CHAT_ID=')) {
@@ -33,7 +31,6 @@ function saveAdminId(chatId) {
     }
 }
 
-// Главное меню для пользователя
 function userMenu() {
     return {
         reply_markup: {
@@ -46,7 +43,7 @@ function userMenu() {
     };
 }
 
-// Меню для админа
+// admin menu
 function adminMenu() {
     return {
         reply_markup: {
@@ -59,7 +56,6 @@ function adminMenu() {
     };
 }
 
-// Построить inline-кнопки тикетов
 function buildTicketButtons() {
     const rows = [];
     let row = [];
@@ -76,7 +72,6 @@ function buildTicketButtons() {
     return rows;
 }
 
-// Отправить уведомление админу
 async function notifyAdmin(text, replyMarkup) {
     if (!ADMIN_CHAT_ID) {
         console.warn('Admin chat_id not set. Send /admin to the bot first.');
@@ -88,7 +83,7 @@ async function notifyAdmin(text, replyMarkup) {
     });
 }
 
-// ── /start — приветствие для пользователя ───────────────────────────────────
+// start
 bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     if (chatId === ADMIN_CHAT_ID) {
@@ -107,15 +102,19 @@ bot.onText(/\/start/, async (msg) => {
     );
 });
 
-// ── /admin — регистрация тебя как админа ────────────────────────────────────
+// /admin 
 bot.onText(/\/admin/, async (msg) => {
     const chatId = msg.chat.id;
     const password = msg.text.split(' ')[1];
-    const adminPassword = process.env.ADMIN_PASSWORD || 'mintsim2024';
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
+    if (!adminPassword) {Ы
+        console.error('ADMIN_PASSWORD env variable is not set');
+        process.exit(1);
+    }
     if (password !== adminPassword) {
-        await bot.sendMessage(chatId, '❌ Wrong password. Usage: /admin <password>');
-        return;
+    await bot.sendMessage(chatId, '❌ Wrong password. Usage: /admin <password>');
+    return;
     }
 
     saveAdminId(chatId);
@@ -125,7 +124,7 @@ bot.onText(/\/admin/, async (msg) => {
     );
 });
 
-// ── Обработка текстовых сообщений ───────────────────────────────────────────
+// text message
 bot.on('message', async (msg) => {
     if (!msg.text || msg.text.startsWith('/')) return;
 
@@ -135,7 +134,7 @@ bot.on('message', async (msg) => {
     const firstName = msg.from.first_name || 'User';
     const text      = msg.text;
 
-    // ── ADMIN: ответ на тикет ──
+    // ADMIN reply
     if (chatId === ADMIN_CHAT_ID) {
         if (adminReplyState.has(chatId)) {
             const ticketId = adminReplyState.get(chatId);
@@ -154,7 +153,7 @@ bot.on('message', async (msg) => {
             return;
         }
 
-        // Кнопки меню админа
+        // buttton admin
         if (text === '📋 Open Tickets') {
             const buttons = buildTicketButtons();
             if (buttons.length === 0) {
@@ -179,7 +178,7 @@ bot.on('message', async (msg) => {
         return;
     }
 
-    // ── USER: кнопки меню ──
+    // USER buttons
     if (text === '✉️ Contact Support') {
         await bot.sendMessage(chatId,
             `📝 Please describe your issue in detail:\n\n` +
@@ -219,7 +218,6 @@ bot.on('message', async (msg) => {
         return;
     }
 
-    // ── USER: новое обращение в поддержку ──
     ticketCounter++;
     const ticketId = ticketCounter;
 
@@ -233,7 +231,6 @@ bot.on('message', async (msg) => {
         createdAt: new Date().toISOString()
     });
 
-    // Подтверждение пользователю
     await bot.sendMessage(chatId,
         `✅ *Your request has been received.*\n\n` +
         `🎫 *Ticket #${ticketId}*\n\n` +
@@ -242,7 +239,6 @@ bot.on('message', async (msg) => {
         { parse_mode: 'Markdown', ...userMenu() }
     );
 
-    // Уведомление админу
     const buttons = buildTicketButtons();
     await notifyAdmin(
         `🆕 *New support ticket #${ticketId}*\n\n` +
@@ -254,7 +250,6 @@ bot.on('message', async (msg) => {
     );
 });
 
-// ── Callback: нажатие кнопки тикета ─────────────────────────────────────────
 bot.on('callback_query', async (query) => {
     const adminChatId = query.message.chat.id;
     const data = query.data;

@@ -514,7 +514,7 @@
     </div> <div class="container-wide">
       <section id="page-main" class="hidden">
         <div class="main-panels" style="gap: 16px;"> <div class="main-panel">
-            <div class="main-panel-title">TOP 👑</div>
+            <div class="main-panel-title">👑</div>
             <div id="topList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
             <div id="myRankRow"></div>
           </div>
@@ -576,11 +576,9 @@
   const BACKEND_URL =
   window.location.hostname === 'localhost'
     ? 'http://localhost:4000'
-    : 'https://api.mintsim.uk'; // <--- Твоя прямая ссылка на Railway
+    : 'https://api.mintsim.uk';
 
   const MANIFEST_URL = 'https://mintsim.uk/tonconnect-manifest.json';
-
-  // TonConnect UI
   const tcUi = new TON_CONNECT_UI.TonConnectUI({
     manifestUrl: MANIFEST_URL,
     actionsConfiguration: {

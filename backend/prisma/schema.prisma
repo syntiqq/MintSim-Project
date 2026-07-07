@@ -30,8 +30,8 @@ model Mint {
 }
 
 model Referral {
-  wallet      String   @id    // кошелёк реферала
-  referredBy  String          // кошелёк того, кто пригласил
+  wallet      String   @id    
+  referredBy  String          
   createdAt   DateTime @default(now())
 
   @@index([referredBy])
@@ -39,7 +39,7 @@ model Referral {
 
 model Withdrawal {
   id          String   @id @default(cuid())
-  wallet      String          // кошелёк того, кто выводит
+  wallet      String          
   amountNano  String
   status      String   @default("pending")
   txHash      String?

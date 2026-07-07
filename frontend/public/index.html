@@ -6,13 +6,51 @@
   <title>MintSim — NFT Minting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/icon.png" type="image/png">
-	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/iosevka@5.2.6/index.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- TonConnect SDK (если подключаешь в будущем) -->
   <script src="https://unpkg.com/@tonconnect/sdk/dist/tonconnect.min.js"></script>
 
   <style>
-    /* ===== БАЗА И ФОН ===== */
+    /* MAIN PAGE */
+  #page-main { display: flex; flex-direction: column; gap: 14px; }
+  .main-panels {
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .main-panel {
+    flex: 1; background: var(--glass); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 12px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-width: 0;
+  }
+  .main-panel-title {
+    font-size: 20px; font-weight: 800; text-align: center;
+    margin-bottom: 4px; white-space: nowrap;
+  }
+  .rank-row {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 14px; padding: 5px 6px;
+    background: rgba(255,255,255,.05); border-radius: 8px;
+  }
+  .rank-num { font-weight: 800; color: var(--text-dim); min-width: 16px; }
+  .rank-val { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-sub { color: var(--text-dim); font-size: 14px; white-space: nowrap; }
+  .rank-row.my-rank { background: rgba(140,110,255,.18); border: 1px solid rgba(140,110,255,.35); }
+
+  /* APPS PAGE */
+  .app-row {
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(255,255,255,.06); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; cursor: pointer;
+    transition: background .15s;
+    text-decoration: none; color: inherit;
+  }
+  .app-row:hover { background: rgba(255,255,255,.10); }
+  .app-row-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 8px; }
+  .app-row-text { flex: 1; }
+  .app-row-title { font-weight: 700; font-size: 14px; }
+  .app-row-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
     :root {
       --glass: rgba(15, 2, 20, 0.64);
       --border: rgba(255,255,255,.10);
@@ -33,7 +71,6 @@
     }
     a { color: inherit; text-decoration: none; }
 
-    /* 🪐 Канвас с частицами */
     #particles {
       position: fixed;
       top: 0;
@@ -48,26 +85,30 @@
       z-index: 1;
     }
 
-    /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
+    /*high panel*/
     header {
       position: sticky;
       top: 0;
       left: 0;
       width: 100%;
       z-index: 20;
-
       display: flex;
       align-items: center;
       justify-content: space-between;
-
       padding: 14px 18px;
-
-      background: var(--glass);
+      background: rgba(35, 23, 54, 0.89);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
     }
-    .brand { font-weight: 800; letter-spacing: .4px; font-size: 24px; }
-    .wallet-left {justify-self:center; font-size: 12px; color: var(--text-dim); }
+
+    #mintsimBtn {
+      font-weight: 800; font-size: 18px; padding: 8px 20px; border-radius: 12px;
+    }
+
+    .wallet-left {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      font-size: 12px; color: var(--text-dim);
+    }
     .wallet-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.06); border: 1px solid var(--border); font-size: 13px; }
     .wallet-actions { display:flex; gap:10px; align-items:center; }
 
@@ -82,51 +123,59 @@
     .btn:hover { transform: translateY(-1px); box-shadow: 0 0 24px rgba(140,110,255,.6); }
     .btn-ghost { background: rgba(255,255,255,.10); box-shadow: none; border:1px solid var(--border); }
     .btn-ghost:hover { background: rgba(255,255,255,.16); }
+    .btn-mint-big {
+      padding: 18px 44px;
+      font-size: 19px;
+      border-radius: 18px;
+    }
 
-    /* ===== КОНТЕНТНЫЕ СЕКЦИИ ===== */
-    /* увеличил нижний отступ, чтобы полностью была видна карточка и место под таббар */
-    main { padding: 18px 14px 140px; }
-    .container { max-width: 560px; margin: 0 auto; }
+    main { padding: 18px 14px 140px; width: 100%;}
+    .container { max-width: 560px; margin: 0 auto; width: 100%;}
+    .container-wide { max-width: 1000px; margin: 0 auto; width: 100%; }
 
-    /* Mint карточка */
+    #page-mint { display: flex; flex-direction: column; align-items: center; }
+
+    /* Mint */
     .mint-card {
       position: relative;
-      width: 130%;
+      width: 70%;
       aspect-ratio: 1/1;
-	    margin-left:-15%;
       border-radius: 22px;
       overflow: hidden;
-      background: rgba(35, 23, 54, 0.89); /* фон */
+      background: rgba(35, 23, 54, 0.89);
       border: 2px solid var(--border);
       box-shadow: 0 16px 26px rgba(0,0,0,.38);
-	    opacity: .85;
+      opacity: .85;
     }
 
     .mint-logo {
-      position: absolute; top: 12px; right: 12px;
-      width: 50px; height: 50px; object-fit: cover; opacity: .55;
-	    border-radius: 50%;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,.45));
+      position: absolute; top: 24px; right: 16px;
+      width: 150px; height: 150px; object-fit: cover; opacity: 1;
+      border-radius: 0;
+      filter: drop-shadow(0 2px 8px rgba(35, 23, 54, 0.89));
     }
     .mint-number {
       position: absolute; left: 0; right: 0; bottom: 18px;
+      font-family: "Iosevka", monospace;
       padding: 0 22px;
       text-align: left;
     }
     .mint-number-prefix {
       font-weight: 800;
       letter-spacing: .05em;
-      font-size: 20px;
+      font-size:44px;
       line-height: 1.15;
       text-shadow: 0 2px 14px rgba(0,0,0,.45);
+      font-family: "Iosevka", monospace;
     }
     .mint-number-digits {
       font-weight: 800;
       letter-spacing: .05em;
-      font-size: 30px;
+      font-size: 44px;
       line-height: 1.15;
       white-space: nowrap;
       text-shadow: 0 2px 14px rgba(0,0,0,.45);
+      font-family: "Iosevka", monospace;
     }
     .mint-number-caption {
       margin-top: 6px;
@@ -138,6 +187,67 @@
 
     .minted-line { margin-top: 14px; text-align: center; color: var(--text-dim); font-size: 15px; }
 
+    .ref-stats { display: flex; gap: 12px; margin: 14px 0; }
+    /* Уменьшенная кнопка Withdraw */
+    .withdraw-btn { width: 50%;
+      margin: 14px auto;
+      display: block;
+      font-size: 16px;
+      padding: 20px 16px;
+    }
+    .ref-stat {
+      flex: 1; background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 12px;
+    }
+    .ref-stat-label { display:block; font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+    .ref-stat-value { display:block; font-weight: 800; font-size: 16px; }
+
+    .ref-list-title { margin-top: 18px; margin-bottom: 8px; font-weight: 700; font-size: 14px; color: var(--text-dim); }
+    .ref-list,
+    .numbers-list { display: flex; flex-direction: column; gap: 8px; }
+    .number-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .number-row-logo {
+      width: 36px;
+      height: 50px;
+      object-fit: contain;
+    }
+    .number-row-text {
+      font-family: "Iosevka", monospace;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: .05em;
+      color: #fff;
+    }
+    .ref-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; font-size: 13px;
+    }
+    .ref-row {
+      display: grid;
+      grid-template-columns: 1fr 80px 90px;
+      gap: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      align-items: center;
+    }
+.ref-row-head {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
+}
+.ref-row:not(.ref-row-head) {
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+    .ref-empty { color: var(--text-dim); font-size: 13px; text-align: center; padding: 16px 0; }
+
     .card {
       background: var(--glass);
       border: 1px solid var(--border);
@@ -145,12 +255,23 @@
       padding: 20px;
       box-shadow: 0 10px 28px rgba(0,0,0,.35);
     }
+    .card-numbers {
+      max-height: calc(100vh - 18px - 14px - 64px - 140px);
+      display: flex;
+      flex-direction: column;
+    }
+    .card-numbers .numbers-list,
+    .card-numbers .ref-list {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 4px;
+    }
 
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
     .tabbar {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-      background: rgba(12,12,20,.94);
+      background: rgba(35, 23, 54, 0.89);
       border-top: 1px solid var(--border);
       padding: 12px 20px 16px;
       display: flex; align-items: flex-end; justify-content: space-between;
@@ -171,7 +292,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      transform: translateY(-12px);
+      transform: translateY(-20px);
     }
     .tab-center .dock {
       width: 20px;
@@ -193,33 +314,78 @@
     .logo-mini {
       width: 70px;
       height: 70px;
-      border-radius: 50%;
+      border-radius: 0;
       object-fit: cover;
     }
     .tab-center span {
       font-size: 13px;
       color: white;
       text-align: center;
-      margin-top: 4px;
+      margin-top: 8px;
     }
     .hidden { display: none !important; }
 
 @media (max-width:768px){
-header{
-display:grid;
-grid-template-columns:1fr auto 1fr;
-padding:10px;
-}
-.brand{justify-self:start;font-size:20px;}
-.wallet-left{justify-self:center;display:flex;justify-content:center;flex:1;}
-.wallet-chip{max-width:140px;overflow:hidden;}
-.wallet-actions{justify-self:end;gap:5px;}
-#disconnectBtn{padding:8px 12px;font-size:13px;}
-.logo-mini{width:80px;height:80px;}
-.dock{width:40px;height:40px;border-radius:50%;}
-.mint-card{width:100%;margin-left:0;}
+  header{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    padding:10px;
+  }
+  
 
+  #mintsimBtn {
+    width: 100px;
+    font-size: 16px;
+    padding: 6px 4px; 
+    border-radius: 10px;
+  }
+  
+  .withdraw-btn { width: 50%;
+      margin: 14px auto;
+      display: block;
+      font-size: 12px;
+      padding: 10px 8px;
+    }
+  .wallet-left {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    font-size: 12px; color: var(--text-dim);
+  }
+  .wallet-chip{max-width:140px;overflow:hidden;}
+  .wallet-actions{grid-column:3; justify-self:end; gap:5px;}
+  #disconnectBtn{padding:8px 12px;font-size:13px;}
+  .logo-mini{width:80px;height:80px;}
+  .dock{width:40px;height:40px;border-radius:50%;}
+  .mint-card{width:70%;margin:0 auto;}
+  .mint-number-prefix,
+  .mint-number-digits {font-size: 24px;}
+  .mint-number-caption {font-size: 11px;}
+  .mint-logo {top: 16px;right: 8px;width: 70px;height: 70px;}
+
+  .main-panels { 
+    flex-direction: row; 
+    overflow-x: auto; 
+    padding-bottom: 10px; 
+  }
+  .main-panel {
+    min-width: 140px;
+  }
+  #page-referral .card {
+    padding: 12px; 
+    margin: 0; 
+  }
+  #page-referral .card-numbers {
+    max-height: 70vh; 
+  }
+  #page-referral #refLink {
+    font-size: 8px; 
+    padding: 6px;
+  }
+  #page-referral .ref-stats {
+    gap: 8px; 
+    margin: 10px 0;
+  }
 }
+
 
   </style>
 </head>
@@ -228,7 +394,7 @@ padding:10px;
   <canvas id="particles"></canvas>
 
   <header>
-    <div class="brand">MintSim</div>
+    <button id="mintsimBtn" class="btn" onclick="openTab('main')">MintSim</button>
     <div class="wallet-left" id="walletLeft">
       <span class="wallet-chip" id="walletChip" style="display:none">
         <span id="walletShort">—</span>
@@ -254,15 +420,15 @@ padding:10px;
           </div>
         </div>
         <div class="minted-line">
-          <span id="mintedCount" data-minted="12345">12345</span> numbers already minted
+          <span id="mintedCount">0</span> numbers already minted
         </div>
-	      <div style="display: flex; justify-content: center; margin-top: 40px;">
-    		  <button class="btn" onclick="mintNumber()">Mint Number</button>
- 	      </div>
+        <div style="display: flex; justify-content: center; margin-top: 10px;">
+          <button class="btn btn-mint-big" onclick="mintNumber()">Mint Number</button>
+        </div>
       </section>
 
       <section id="page-referral" class="hidden">
-        <div class="card">
+        <div class="card card-numbers">
           <h3 style="margin:0 0 12px; font-weight:800;">Referral</h3>
           <div id="refLink" class="mono" style="word-break:break-all; font-size:14px; background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:12px; padding:12px;">
           </div>
@@ -270,17 +436,96 @@ padding:10px;
             <button class="btn" style="flex:1" onclick="shareReferral()">Share</button>
             <button class="btn btn-ghost" style="flex:1" onclick="copyReferral()">Copy</button>
           </div>
+
+          <div class="ref-stats">
+            <div class="ref-stat">
+              <span class="ref-stat-label">Reward per referral</span>
+              <span class="ref-stat-value" id="refReward">0 GRAM</span>
+            </div>
+            <div class="ref-stat">
+              <span class="ref-stat-label">Available to withdraw</span>
+              <span class="ref-stat-value" id="refEarned">0 GRAM</span>
+            </div>
+          </div>
+          <button class="btn withdraw-btn" onclick="withdrawReward()">Withdraw to wallet</button>
+
+          <div class="ref-list-title">Your referrals</div>
+          <div id="referralList" class="ref-list">
+            <div class="ref-empty">No referrals yet</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-numbers" class="hidden">
+        <div class="card card-numbers">
+          <h3 style="margin:0 0 8px; font-weight:800;">Numbers</h3>
+          <p style="margin:0 0 14px; color:var(--text-dim); font-size:14px;">Numbers minted on this site that belong to your connected wallet.</p>
+          <div id="numbersList" class="numbers-list">
+            <div class="ref-empty">Connect your wallet to see your numbers</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-apps" class="hidden">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <p style="margin:0 0 8px;color:var(--text-dim);font-size:14px;">
+            In the future connected websites and apps will appear here, where you'll be able to use this number.
+          </p>
+
+          <a class="app-row" href="https://getgems.io/mintsim" target="_blank" rel="noreferrer">
+            <img class="app-row-logo" src="https://getgems.io/favicon.ico" alt="Getgems">
+            <div class="app-row-text">
+              <div class="app-row-title">getgems.io</div>
+              <div class="app-row-sub">View and trade MintSim numbers on Getgems marketplace</div>
+            </div>
+          </a>
+
+          <a class="app-row" href="https://t.me/MintSim_OTC" target="_blank" rel="noreferrer">
+            <img class="app-row-logo" src="/logo.png" alt="MintSim OTC">
+            <div class="app-row-text">
+              <div class="app-row-title">MintSim OTC</div>
+              <div class="app-row-sub">Buy and sell numbers peer-to-peer in Telegram</div>
+            </div>
+          </a>
         </div>
       </section>
 
       <section id="page-news" class="hidden">
-        <div class="card" style="text-align:center">
-          <h3 style="margin:0 0 8px; font-weight:800;">News</h3>
-          <p style="margin:6px 0 14px; color:var(--text-dim)">Our Telegram chanel</p>
-          <a id="tgLink" class="btn" target="_blank" rel="noreferrer">Open Telegram</a>
+        <div class="card" style="
+          width: 70%;
+          margin-left: 15%;
+          min-height: 260px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          text-align: center;
+          padding: 24px;
+        ">
+          <h3 style="margin:0; font-weight:800;">News</h3>
+          <p style="margin:0; color:var(--text-dim);">
+            Our Telegram channel
+          </p>
+          <a id="tgLink" class="btn" target="_blank" rel="noreferrer">
+            Open Telegram
+          </a>
         </div>
       </section>
+    </div> <div class="container-wide">
+      <section id="page-main" class="hidden">
+        <div class="main-panels" style="gap: 16px;"> <div class="main-panel">
+            <div class="main-panel-title">👑</div>
+            <div id="topList"><div class="ref-empty" style="font-size:11px">Loading…</div></div>
+            <div id="myRankRow"></div>
+          </div>
 
+          <div class="main-panel">
+            <div class="main-panel-title">💎</div>
+            <div id="beautifulList"><div class="ref-empty" style="font-size:14px">Loading…</div></div>
+          </div>
+
+        </div>
+      </section>
     </div>
   </main>
 
@@ -292,11 +537,29 @@ padding:10px;
       <span>Referral</span>
     </a>
 
+    <a href="#numbers" class="tab" id="tab-numbers" onclick="openTab('numbers')">
+      <span class="icon" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg>
+      </span>
+      <span>Numbers</span>
+    </a>
+
     <button class="tab tab-center" id="tab-mint" onclick="openTab('mint')" aria-label="Mint">
       <div class="dock">
         <img class="logo-mini" src="/logo.png" alt="Mint">
       </div>
     </button>
+
+    <a href="#apps" class="tab" id="tab-apps" onclick="openTab('apps')">
+      <span class="icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
+          <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+          <circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
+        </svg>
+      </span>
+      <span>Apps</span>
+    </a>
 
     <a href="#news" class="tab" id="tab-news" onclick="openTab('news')">
       <span class="icon" aria-hidden="true">
@@ -309,14 +572,13 @@ padding:10px;
   </nav>
 
 <script>
-  // === Конфиг ===
+ // config
   const BACKEND_URL =
   window.location.hostname === 'localhost'
     ? 'http://localhost:4000'
     : 'https://api.mintsim.uk';
-  const MANIFEST_URL = 'https://mintsim.uk/tonconnect-manifest.json';
 
-  // === TonConnect UI ===
+  const MANIFEST_URL = 'https://mintsim.uk/tonconnect-manifest.json';
   const tcUi = new TON_CONNECT_UI.TonConnectUI({
     manifestUrl: MANIFEST_URL,
     actionsConfiguration: {
@@ -326,7 +588,8 @@ padding:10px;
 
   function getWalletAddress() {
     const acc = tcUi.account;
-    return acc?.address || '';
+    if (!acc?.address) return '';
+    return TON_CONNECT_UI.toUserFriendlyAddress(acc.address);
   }
 
   tcUi.onStatusChange(() => {
@@ -335,12 +598,17 @@ padding:10px;
     else updateWalletUI('', '');
   });
 
-  // === Telegram auth (мягкая, если эндпоинта нет — пропускаем) ===
+  // Telegram auth
   let AUTH = { token: null, user: null };
 
   function getInitData() {
     const tg = window.Telegram?.WebApp;
     return tg?.initData || '';
+  }
+  
+  function formatNumber(raw) {
+    const digits = String(raw).replace(/\D/g, '');
+    return digits.replace(/(\d{2})(\d{3})(\d{3})/, '$1 $2 $3');
   }
 
   function getTgId() {
@@ -354,16 +622,22 @@ padding:10px;
     return demo;
   }
 
+  function getRefFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) localStorage.setItem('referred-by', ref);
+    return localStorage.getItem('referred-by') || null;
+  }
+
   async function authWithTelegram() {
   try {
     const initData = getInitData();
     const res = await fetch(`${BACKEND_URL}/api/auth/telegram`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ initData })
+      body: JSON.stringify({ initData, ref: getRefFromUrl() })
     });
 
-    // если роут не существует — тихо выходим
     if (res.status === 404) {
       console.log('Auth endpoint not found — skipping Telegram auth (ok).');
       return;
@@ -385,9 +659,9 @@ padding:10px;
   }
 }
 
-  // === Универсальный API-коллер к бэку ===
+  // API-caller
   async function api(path, opts = {}) {
-    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    const headers = { 'Content-Type': 'application/json', 'x-tg-id': getTgId(), ...(opts.headers || {}) };
     if (AUTH.token) headers['Authorization'] = `Bearer ${AUTH.token}`;
     const res = await fetch(`${BACKEND_URL}${path}`, { ...opts, headers });
     const text = await res.text();
@@ -399,7 +673,7 @@ padding:10px;
     return data ?? {};
   }
 
-  // === Кошелёк ===
+  // wallet
   async function connectWallet() {
     try {
       await tcUi.openModal();
@@ -418,7 +692,7 @@ padding:10px;
     }
   }
 
-  // === Сборка comment-payload без бандлера, через esm.sh ===
+  // comment-payload 
 async function buildCommentPayload(comment) {
   const { beginCell } = await import('https://esm.sh/@ton/core@0.59.0');
   return beginCell()
@@ -429,7 +703,7 @@ async function buildCommentPayload(comment) {
     .toString('base64');
 }
 
-// === Опрос статуса заказа до подтверждения ===
+// status
 function pollOrderStatus(orderId, onUpdate) {
   return new Promise((resolve) => {
     const interval = setInterval(async () => {
@@ -449,9 +723,9 @@ function pollOrderStatus(orderId, onUpdate) {
   });
 }
 
-// === Mint ===
+// Mint
 async function mintNumber() {
-  const btn = document.querySelector('#page-mint button.btn');
+  const btn = document.querySelector('#page-mint button.btn-mint-big');
   try {
     if (btn) { btn.disabled = true; btn.textContent = 'Minting nft…'; }
 
@@ -461,16 +735,16 @@ async function mintNumber() {
       return;
     }
 
-    // Шаг 1 — создать заказ на backend
+    // backend order
     const orderRes = await fetch(`${BACKEND_URL}/api/mint/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-tg-id': getTgId() },
-      body: JSON.stringify({ walletAddress: wallet.address })
+      body: JSON.stringify({ walletAddress: wallet.address, ref: getRefFromUrl() })
     });
     const order = await orderRes.json();
     if (!orderRes.ok || !order.ok) throw new Error(order?.detail || 'Could not create an order');
 
-    // Шаг 2 — отправить оплату с комментарием
+    // payment
     if (btn) btn.textContent = `Confirm the transaction in your wallet ${order.amountTon} Gram (TON)…`;
     const payload = await buildCommentPayload(order.comment);
 
@@ -483,18 +757,17 @@ async function mintNumber() {
       }]
     });
 
-    // Шаг 3 — ждём подтверждения и минта от backend
+    // mint on backend
     if (btn) btn.textContent = 'Waiting for network confirmation…';
     const finalOrder = await pollOrderStatus(order.orderId, (o) => {
       if (btn && o.status === 'paid') btn.textContent = 'Payment found, minting…';
     });
 
     if (finalOrder.status === 'confirmed') {
-      alert(`✅ Your number has been successfully minted +999${finalOrder.number}`);
-      document.getElementById('mintNumberDigits').textContent = finalOrder.number;
-    } else {
-      alert('❌ Mint failed: ' + order.orderId + ' — please contact support.');
-    }
+  const pretty = formatNumber(finalOrder.number);
+  alert(`✅ Your number has been successfully minted +999 ${pretty}`);
+  document.getElementById('mintNumberDigits').textContent = pretty;
+  }
 
   } catch (e) {
     console.error(e);
@@ -504,26 +777,88 @@ async function mintNumber() {
   }
 }
 
-  // === Реферал (опционально) ===
+  // ref
+  const REFERRAL_REWARD_GRAM = 0.5;
+
+  function renderReferralList(list) {
+    const wrap = document.getElementById('referralList');
+    if (!list || !list.length) {
+        wrap.innerHTML = '<div class="ref-empty">No referrals yet</div>';
+        return;
+    }
+    wrap.innerHTML = `
+        <div class="ref-row ref-row-head">
+            <span>Wallet</span><span>Mints</span><span>Earned</span>
+        </div>
+    ` + list.map(r => `
+        <div class="ref-row">
+            <span class="mono" title="${r.wallet}">${r.walletShort || shortAddr(r.wallet)}</span>
+            <span>${r.mints}</span>
+            <span>${(r.rewardTon || 0).toFixed(2)} GRAM</span>
+        </div>
+    `).join('');
+}
+
   async function loadReferralFromBackend() {
+    const wallet = getCurrentWalletAddress();
+    if (!wallet) {
+        document.getElementById('refReward').textContent = '0.5 GRAM';
+        renderReferralList([]);
+        return;
+    }
     try {
-      const data = await api('/api/referral/me', { method: 'GET' });
-      if (data?.link) {
-        document.getElementById('refLink').textContent = data.link;
-      }
+        const data = await api(`/api/referral/me?wallet=${encodeURIComponent(wallet)}`, { method: 'GET' });
+        document.getElementById('refReward').textContent = (data.rewardPerMint || 0.5) + ' GRAM';
+        document.getElementById('refEarned').textContent = (data.totalAvailable || 0).toFixed(2) + ' GRAM';
+        if (data.totalAvailable > 0) {
+            document.getElementById('withdrawBtn').style.display = 'block';
+        }
+        renderReferralList(data?.referrals || []);
     } catch {
-      console.log('No referral from backend (ok). Using local builder.');
+        renderReferralList([]);
+    }
+}
+
+  function renderNumbersList(list) {
+    const wrap = document.getElementById('numbersList');
+    if (!list || !list.length) {
+      wrap.innerHTML = '<div class="ref-empty">No numbers yet</div>';
+      return;
+    }
+    wrap.innerHTML = list.map(n => `
+      <div class="number-row">
+        <img src="/logo.png" class="number-row-logo" alt="">
+        <span class="number-row-text">${n.number}</span>
+      </div>
+    `).join('');
+  }
+
+  async function loadMyNumbers() {
+    const wrap = document.getElementById('numbersList');
+    const addr = getCurrentWalletAddress();
+    if (!addr) {
+      wrap.innerHTML = '<div class="ref-empty">Connect your wallet to see your numbers</div>';
+      return;
+    }
+    try {
+      const data = await api(`/api/numbers/${addr}`, { method: 'GET' });
+      renderNumbersList(data?.numbers || []);
+    } catch {
+      renderNumbersList([]);
     }
   }
 
-  // === Boot ===
+  // Boot
+  const MINTED_COUNT = 24;
+  document.getElementById('mintedCount').textContent = MINTED_COUNT;
+
   (async function boot() {
     try { window.Telegram?.WebApp?.ready(); window.Telegram?.WebApp?.expand(); } catch {}
     await authWithTelegram();
     await loadReferralFromBackend();
   })();
 
-  // === Проверка связи с бэком (устойчивая) ===
+  // connect to backend
   (async () => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/ping`, { cache: 'no-store' });
@@ -543,24 +878,27 @@ async function mintNumber() {
   }
 })();
 
-  // === UI-хелперы/прочее ===
+  // UI helper
   const SITE_URL = 'https://mintsim.uk';
-  const TELEGRAM_CHANNEL = 'https://t.me/kurim_blant';
+  const TELEGRAM_CHANNEL = 'https://t.me/MintSim_Official';
   document.getElementById('tgLink').href = TELEGRAM_CHANNEL;
 
   function setActiveTab(tab) {
-    ['referral','mint','news'].forEach(id => {
+    ['referral','numbers','mint','apps','news'].forEach(id => {
       document.getElementById('tab-'+id).classList.toggle('active', id === tab);
     });
   }
 
   function openTab(tab) {
-    document.getElementById('page-referral').classList.toggle('hidden', tab !== 'referral');
-    document.getElementById('page-mint').classList.toggle('hidden', tab !== 'mint');
-    document.getElementById('page-news').classList.toggle('hidden', tab !== 'news');
+    ['referral','numbers','mint','apps','news','main'].forEach(id => {
+        const el = document.getElementById('page-' + id);
+        if (el) el.classList.toggle('hidden', id !== tab);
+    });
     setActiveTab(tab);
-    if (tab === 'referral') buildReferralLink();
-  }
+    if (tab === 'referral') { buildReferralLink(); loadReferralFromBackend(); }
+    if (tab === 'numbers') loadMyNumbers();
+    if (tab === 'main') loadMainPage();
+}
   openTab('mint');
 
   function getCurrentWalletAddress() {
@@ -568,7 +906,7 @@ async function mintNumber() {
   }
 
   function buildReferralLink() {
-    const addrOrCode = getCurrentWalletAddress() || 'YOUR_REF_CODE';
+    const addrOrCode = getCurrentWalletAddress() || 'YOUR_WALLET';
     const link = SITE_URL + '/?ref=' + encodeURIComponent(addrOrCode);
     document.getElementById('refLink').textContent = link;
     return link;
@@ -583,6 +921,21 @@ async function mintNumber() {
       await navigator.clipboard.writeText(link); alert('The link is copied✅');
     }
   }
+
+  async function withdrawReward() {
+    const wallet = tcUi.account;
+    if (!wallet?.address) { alert('Connect your wallet first'); return; }
+    try {
+        const data = await api('/api/referral/withdraw', {
+            method: 'POST',
+            body: JSON.stringify({ walletAddress: wallet.address, ref: getRefFromUrl() })
+        });
+        alert(`✅ Withdrawn ${data.amountTon.toFixed(2)} GRAM to your wallet`);
+        loadReferralFromBackend();
+    } catch (e) {
+        alert('❌ Withdraw failed: ' + (e?.message || e));
+    }
+}
 
   async function copyReferral() {
     const link = buildReferralLink();
@@ -620,7 +973,7 @@ async function mintNumber() {
     if (!document.getElementById('page-referral').classList.contains('hidden')) buildReferralLink();
   }
 
-  // Партиклы (фон)
+  // backround
   (function particles() {
     const cvs = document.getElementById('particles');
     const ctx = cvs.getContext('2d');
@@ -653,6 +1006,7 @@ async function mintNumber() {
         d.x += d.vx; d.y += d.vy;
         if (d.x < 0 || d.x > W) d.vx *= -1;
         if (d.y < 0 || d.y > H) d.vy *= -1;
+
         ctx.globalAlpha = d.a;
         ctx.beginPath();
         ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
@@ -664,6 +1018,50 @@ async function mintNumber() {
     resize();
     step();
   })();
+
+async function loadMainPage() {
+    const wallet = getCurrentWalletAddress();
+
+    // TOP
+    try {
+        const data = await api(`/api/stats/top${wallet ? '?wallet=' + encodeURIComponent(wallet) : ''}`, { method: 'GET' });
+        const topEl = document.getElementById('topList');
+        
+        topEl.innerHTML = (data.top || []).map(r => {
+          
+            const friendlyAddr = r.wallet 
+                ? TON_CONNECT_UI.toUserFriendlyAddress(r.wallet) 
+                : (r.walletShort || 'Unknown');
+                
+            return `
+            <div class="rank-row">
+                <span class="rank-num">#${r.rank}</span>
+                <span class="rank-val mono" title="${friendlyAddr}">${shortAddr(friendlyAddr)}</span>
+                <span class="rank-sub">${r.count} 🔢</span>
+            </div>
+            `;
+        }).join('');
+        
+        const myRankEl = document.getElementById('myRankRow');
+        if (data.myRank && data.myRank.rank > 10) {
+            myRankEl.innerHTML = `<div class="rank-row my-rank">
+                <span class="rank-num">#${data.myRank.rank}</span>
+                <span class="rank-val mono">You</span>
+                <span class="rank-sub">${data.myRank.count} 🔢</span>
+            </div>`;
+        }
+    } catch (e) { console.log('top error', e); }
+    // BEAUTIFUL
+    try {
+        const data = await api('/api/stats/beautiful', { method: 'GET' });
+        document.getElementById('beautifulList').innerHTML = (data.top || []).map((r, i) => `
+            <div class="rank-row">
+                <span class="rank-num">#${i + 1}</span>
+                <span class="rank-val mono" style="font-size:14px">${r.formatted}</span>
+            </div>
+        `).join('');
+    } catch (e) { console.log('beautiful error', e); }
+  }
 </script>
 </body>
 </html>

@@ -1,7 +1,16 @@
 {
-  "name": "MintSim",
-  "description": "Коллекция NFT-номеров на TON.",
-  "image": "https://crimson-implicit-bandicoot-615.mypinata.cloud/ipfs/bafkreienu3klfd46nohecxgavx6ptxwexap4a2u7sh3pxirenxfsrzy6yq",
-  "external_link": "https://mint-sim-project.vercel.app",
-  "marketplace": "getgems.io"
+  "name": "MintSim NFT",
+  "description": "NFT collection of anonymous numbers",
+  "image": "https://crimson-implicit-bandicoot-615.mypinata.cloud/ipfs/bafkreid34m3k4kudcqam7aorx2ukruf2x7bpatytlcuo5ypeb2dpjty25y",
+  "cover_image": "https://crimson-implicit-bandicoot-615.mypinata.cloud/ipfs/bafkreifabi2fg4vkl37doyaezgel6jcuuu4xntqtrfrivrmwsj4hhs26gu",
+  "external_link": "https://mintsim.uk",
+  "marketplace": "getgems.io",
+  "social_links": [
+    "https://mintsim.uk",
+    "https://t.me/MintSim_Official"
+  ],
+  "royalties": {
+    "address": "UQCx8J7D8ynUKSid6B92Ky8Dr5rzObfFu3ia5JHtS43Bavfp",
+    "amount": 50
+  }
 }

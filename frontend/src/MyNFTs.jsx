@@ -24,32 +24,32 @@ export default function MyNFTs() {
             .finally(() => setLoading(false));
     }, [wallet]);
 
-    if (!wallet) return <p style={{ padding: 20 }}>Подключи кошелёк, чтобы увидеть свои NFT.</p>;
-    if (loading) return <p style={{ padding: 20 }}>Загрузка…</p>;
+    if (!wallet) return <p style={{ padding: 20 }}>Connect the wallet to see your numbers.</p>;
+    if (loading) return <p style={{ padding: 20 }}>loading…</p>;
 
     return (
         <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
-            <h2>Мои заказы ({mints.length})</h2>
-            {mints.length === 0 && <p>Пока нет заказов.</p>}
+            <h2>My orders ({mints.length})</h2>
+            {mints.length === 0 && <p>No orders.</p>}
 
             {mints.map(m => (
                 <div key={m.id} style={{
                     border: '1px solid #ddd', borderRadius: 8, padding: 12, marginBottom: 8
                 }}>
-                    <strong>Номер: {m.number}</strong>
+                    <strong>Number: {m.number}</strong>
                     <div style={{ fontSize: 12, color: m.status === 'confirmed' ? 'green' : '#888' }}>
-                        Статус: {m.status}
+                        Status: {m.status}
                     </div>
                     {m.nftAddress && (
                         <a href={`https://getgems.io/nft/${m.nftAddress}`} target="_blank" rel="noreferrer" style={{ fontSize: 12 }}>
-                            Открыть в GetGems →
+                            Open in Getgems.io →
                         </a>
                     )}
                 </div>
             ))}
 
-            <h2 style={{ marginTop: 24 }}>NFT в кошельке ({nfts.length})</h2>
-            {nfts.length === 0 && <p>NFT в этом кошельке не найдены.</p>}
+            <h2 style={{ marginTop: 24 }}>NFT in wallet ({nfts.length})</h2>
+            {nfts.length === 0 && <p>no NFT in wallet.</p>}
 
             {nfts.map((nft, i) => (
                 <div key={i} style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12, marginBottom: 8 }}>

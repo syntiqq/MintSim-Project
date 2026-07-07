@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 app.disable('x-powered-by');
 app.set('trust proxy', true);
 
-app.use(express.json({ limit: '100kb' })); // было 10mb
+app.use(express.json({ limit: '100kb' }));
 app.use(morgan('dev'));
 
 // STATIC
@@ -55,7 +55,7 @@ app.use('/api/referral', require('./routes/referral'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/admin', require('./routes/admin'));
 
-// HEALTH (used by Railway's healthcheck)
+// HEALTH 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.get('/api/ping', (_req, res) => {
@@ -75,18 +75,18 @@ app.use((err, _req, res, _next) => {
 });
 
 // START
-// Railway provides PORT automatically — don't hardcode it.
+
 const PORT = Number(process.env.PORT || 4000);
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
 
-// PAYMENT WATCHER (polls every 15s for incoming on-chain payments)
+// PAYMENT WATCHER
 try {
     const { checkPayments } = require('../jobs/PaymentWatcher');
     const { prisma }        = require('./db');
 
     let watcherRunning = false;
     setInterval(() => {
-        if (watcherRunning) return; // The previous cycle has not ended yet — skip.
+        if (watcherRunning) return;
         watcherRunning = true;
         checkPayments(prisma)
             .catch(e => console.error('PaymentWatcher error:', e.message))

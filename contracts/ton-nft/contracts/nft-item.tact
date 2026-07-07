@@ -1,7 +1,3 @@
-// ════════════════════════════════════════════════════════════════════════════
-//  Messages — internal (from Collection) + TEP-62 standard
-// ════════════════════════════════════════════════════════════════════════════
-
 // Sent once by the Collection right after deploying this NftItem.
 message MintTransfer {
     queryId: Int as uint64;
@@ -9,7 +5,7 @@ message MintTransfer {
     content: Cell;
 }
 
-// Standard TEP-62 NFT transfer (opcode is part of the spec — do not change).
+// Standard TEP-62 NFT transfer
 message(0x5fcc3d14) Transfer {
     queryId:             Int as uint64;
     newOwner:            Address;
@@ -47,9 +43,7 @@ struct NftData {
     content:    Cell;
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 //  NftItem contract
-// ════════════════════════════════════════════════════════════════════════════
 
 contract NftItem {
 
@@ -77,8 +71,6 @@ contract NftItem {
         self.content     = msg.content;
     }
 
-    // Standard TEP-62 transfer — lets the owner sell/send the NFT
-    // (this is what GetGems / Tonkeeper use when the user trades it).
     receive(msg: Transfer) {
         require(self.initialized, "Not minted yet");
         require(sender() == self.owner, "Only owner can transfer");
@@ -123,7 +115,7 @@ contract NftItem {
         });
     }
 
-    // ── TEP-62 standard getter ──────────────────────────────────────────────
+    // TEP-62 getter
     get fun get_nft_data(): NftData {
         return NftData{
             init:       self.initialized,
