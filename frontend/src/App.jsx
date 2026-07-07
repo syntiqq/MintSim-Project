@@ -10,7 +10,7 @@ import { useState, useRef } from 'react';
 import { createOrder, getOrderStatus } from './api.js';
 
 const MANIFEST_URL = import.meta.env.VITE_MANIFEST_URL ||
-    'https://mintsim.uk/tonconnect-manifest.json';
+    'https://mintsim.uk/manifest-v2.json';
 
 const PRICE_LABEL = `${import.meta.env.VITE_MINT_PRICE_TON || 5} Gram (TON)`;
 
