@@ -9,7 +9,9 @@ import { beginCell } from '@ton/core';
 import { useState, useRef } from 'react';
 import { createOrder, getOrderStatus } from './api.js';
 
-const MANIFEST_URL = 'https://getgems.io/tonconnect-manifest.json'
+const MANIFEST_URL = import.meta.env.VITE_MANIFEST_URL ||
+    'https://mintsim.uk/tonconnect-manifest.json';
+
 const PRICE_LABEL = `${import.meta.env.VITE_MINT_PRICE_TON || 5} Gram (TON)`;
 
 
