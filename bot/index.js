@@ -266,4 +266,6 @@ bot.on('callback_query', async (query) => {
 
 console.log('✅ MintSim Bot started.');
 //console.log('⚠️  Send /admin <password> to register as admin.');
+// console.log('⚠️  Send /admin <password> to register as admin.');
+
 

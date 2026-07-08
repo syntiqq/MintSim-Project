@@ -73,7 +73,9 @@ app.use((err, _req, res, _next) => {
 // START
 
 const PORT = Number(process.env.PORT || 4000);
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Backend running on port ${PORT}`);
+});
 
 // PAYMENT WATCHER
 try {
