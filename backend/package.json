@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "npm start",
+    "start": "node src/index.js",
     "prisma": "prisma",
     "postinstall": "prisma generate",
     "migrate:dev": "prisma migrate dev",
