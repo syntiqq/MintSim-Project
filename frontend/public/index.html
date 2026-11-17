@@ -185,7 +185,6 @@
     .minted-line { margin-top: 14px; text-align: center; color: var(--text-dim); font-size: 15px; }
 
     .ref-stats { display: flex; gap: 12px; margin: 14px 0; }
-    /* Уменьшенная кнопка Withdraw */
     .withdraw-btn { width: 50%;
       margin: 14px auto;
       display: block;
@@ -721,6 +720,8 @@ function pollOrderStatus(orderId, onUpdate) {
 }
 
 // Mint
+
+
 async function mintNumber() {
   const btn = document.querySelector('#page-mint button.btn-mint-big');
   try {
