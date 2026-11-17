@@ -11,7 +11,7 @@ const ADMIN_ORIGIN = process.env.ADMIN_ORIGIN;
 
 function isAllowedOrigin(origin) {
     if (!origin) return true;
-    if (origin.includes('localhost')) return true;
+    if (process.env.NODE_ENV !== 'production' && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
     if (origin === 'https://mintsim.uk' || origin === 'https://www.mintsim.uk') return true;
     if (EXTRA_ORIGIN && origin === EXTRA_ORIGIN) return true;
     if (origin === ADMIN_ORIGIN) return true;
@@ -34,6 +34,9 @@ app.use((req, res, next) => {
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
+const rateLimit = require('express-rate-limit');
+const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false });
+
 app.use(express.json({ limit: '100kb' }));
 app.use(morgan('dev'));
 
@@ -46,8 +49,8 @@ app.use('/api/mint', require('./routes/mint'));
 app.use('/api/nft',  require('./routes/nft'));
 app.use('/meta',     require('./routes/meta'));
 app.use('/api/numbers', require('./routes/numbers'));
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/referral', require('./routes/referral'));
+app.use('/api/auth',     apiLimiter, require('./routes/auth'));
+app.use('/api/referral', apiLimiter, require('./routes/referral'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/admin', require('./routes/admin'));
 
@@ -58,11 +61,6 @@ app.get('/api/ping', (_req, res) => {
     res.json({ ok: true, service: 'backend', time: new Date().toISOString() });
 });
 
-app.get('/api/env-check', (_req, res) => {
-    const required = ['GETGEMS_COLLECTION', 'MINT_PRICE_TON', 'TON_NETWORK', 'PINATA_JWT', 'DEPLOYER_MNEMONIC'];
-    const missing  = required.filter(k => !process.env[k]);
-    res.json({ ok: missing.length === 0, missing });
-});
 
 // ERROR HANDLER 
 app.use((err, _req, res, _next) => {
