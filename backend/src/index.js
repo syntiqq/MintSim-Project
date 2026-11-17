@@ -18,7 +18,7 @@ function isAllowedOrigin(origin) {
     return false;
 }
 
-app.use(require('helmet')());
+app.use(require('helmet')({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
 app.use((req, res, next) => {
     const origin = req.headers.origin;
@@ -45,14 +45,14 @@ const imagesDir = path.resolve(__dirname, '..', 'images');
 app.use('/images', express.static(imagesDir));
 
 // ROUTES
-app.use('/api/mint', require('./routes/mint'));
-app.use('/api/nft',  require('./routes/nft'));
-app.use('/meta',     require('./routes/meta'));
-app.use('/api/numbers', require('./routes/numbers'));
+app.use('/api/mint',     require('./routes/mint'));
+app.use('/api/nft',      apiLimiter, require('./routes/nft'));
+app.use('/meta',         require('./routes/meta'));
+app.use('/api/numbers',  apiLimiter, require('./routes/numbers'));
 app.use('/api/auth',     apiLimiter, require('./routes/auth'));
 app.use('/api/referral', apiLimiter, require('./routes/referral'));
-app.use('/api/stats', require('./routes/stats'));
-app.use('/api/admin', require('./routes/admin'));
+app.use('/api/stats',    apiLimiter, require('./routes/stats'));
+app.use('/api/admin',    require('./routes/admin'));
 
 // HEALTH 
 app.get('/health', (_req, res) => res.json({ ok: true }));

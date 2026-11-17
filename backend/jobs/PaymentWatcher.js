@@ -1,6 +1,7 @@
 const { pinJson }   = require('../src/utils/pinata');
 const { mintNft }   = require('../src/services/mintOnChain');
 const { formatPhoneNumber } = require('../src/utils/formatNumber');
+
 function isTestnet() {
     return (process.env.TON_NETWORK || 'mainnet') === 'testnet';
 }
@@ -9,11 +10,11 @@ function tonApiBase() {
     return isTestnet() ? 'https://testnet.tonapi.io' : 'https://tonapi.io';
 }
 
-async function fetchRecentTxs(address, limit = 30) {
+async function fetchRecentTxs(address, limit = 100) {
     const url = `${tonApiBase()}/v2/blockchain/accounts/${address}/transactions?limit=${limit}`;
     const headers = process.env.TONAPI_KEY ? { Authorization: `Bearer ${process.env.TONAPI_KEY}` } : {};
     const res = await fetch(url, { headers });
-    if (!res.ok) throw new Error(`TonAPI ${res.status}: ${await res.text()}`);
+    if (!res.ok) throw new Error(`TonAPI ${res.status}`);
     const data = await res.json();
     return data.transactions || [];
 }
@@ -29,6 +30,10 @@ function decodeComment(tx) {
     } catch {
         return null;
     }
+}
+
+function isSuccessful(tx) {
+    return tx.success !== false && !tx.aborted;
 }
 
 async function checkPayments(prisma) {
@@ -47,13 +52,9 @@ async function checkPayments(prisma) {
         console.error('PaymentWatcher: could not fetch transactions:', e.message);
         return;
     }
-//console.log('PaymentWatcher: transactions received —', txs.length);
-//if (txs.length > 0) {
-//   console.log('PaymentWatcher: example in_msg —', JSON.stringify(txs[0].in_msg));
-//}
 
     for (const order of pending) {
-        const match = txs.find(tx => decodeComment(tx) === order.comment);
+        const match = txs.find(tx => isSuccessful(tx) && decodeComment(tx) === order.comment);
         if (!match) continue;
 
         const paidNano = BigInt(match.in_msg?.value ?? 0);
@@ -65,7 +66,6 @@ async function checkPayments(prisma) {
         try {
             await prisma.mint.update({ where: { id: order.id }, data: { status: 'paid', txHash: match.hash } });
 
-         
             const formatted = `+999 ${formatPhoneNumber(order.number)}`;
             const meta = {
                 name: formatted,
@@ -75,7 +75,7 @@ async function checkPayments(prisma) {
             };
             const pinned = await pinJson(meta, `number-${order.number}.json`);
             console.log(`Order ${order.id}: Pinata OK →`, pinned.gatewayUrl);
-            
+
             const result = await mintNft({
                 ownerAddress: order.walletAddress,
                 metaUri: pinned.gatewayUrl,
@@ -93,12 +93,9 @@ async function checkPayments(prisma) {
 
             console.log(`✅ Order ${order.id} → NFT #${result.index} @ ${result.nftAddress}`);
         } catch (e) {
-    console.error(`Order ${order.id}: mint failed —`, e.message);
-    if (e.response?.data) {
-        console.error('  → response data:', JSON.stringify(e.response.data));
-    }
-    await prisma.mint.update({ where: { id: order.id }, data: { status: 'mint_failed' } }).catch(() => {});
-}
+            console.error(`Order ${order.id}: mint failed —`, e.message);
+            await prisma.mint.update({ where: { id: order.id }, data: { status: 'mint_failed' } }).catch(() => {});
+        }
     }
 }
 

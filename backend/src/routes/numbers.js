@@ -23,7 +23,7 @@ router.get('/:wallet', async (req, res) => {
         const collectionAddr = process.env.GETGEMS_COLLECTION;
 
         if (!collectionAddr) {
-            return res.status(500).json({ ok: false, error: 'config', detail: 'GETGEMS_COLLECTION not set' });
+            return res.status(500).json({ ok: false, error: 'config' });
         }
 
         const url = `${tonApiBase()}/v2/accounts/${encodeURIComponent(wallet)}/nfts?collection=${encodeURIComponent(collectionAddr)}&limit=1000`;

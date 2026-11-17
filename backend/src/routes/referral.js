@@ -4,15 +4,31 @@ const router = express.Router();
 let prisma = null;
 try { ({ prisma } = require('../db')); } catch {}
 
-const REWARD_PER_MINT_NANO = BigInt(Math.round(0.5 * 1e9)); // 0.5 TON 
+const REWARD_PER_MINT_NANO = BigInt(Math.round(0.5 * 1e9)); // 0.5 TON
 
 const { Address } = require('@ton/core');
+const { sendTon } = require('../services/mintOnChain');
+
+function walletVariants(addr) {
+    try {
+        const a = Address.parse(String(addr).trim());
+        return [...new Set([
+            a.toRawString(),
+            a.toString({ bounceable: true,  urlSafe: true }),
+            a.toString({ bounceable: false, urlSafe: true }),
+            a.toString({ bounceable: true,  urlSafe: false }),
+            a.toString({ bounceable: false, urlSafe: false }),
+        ])];
+    } catch {
+        return [String(addr || '').trim()];
+    }
+}
 
 function normalizeWallet(addr) {
     try {
         return Address.parse(String(addr).trim()).toRawString();
-    } catch (e) {
-        return (addr || '').trim();
+    } catch {
+        return String(addr || '').trim();
     }
 }
 
@@ -23,8 +39,9 @@ function shortWallet(addr) {
 
 async function computeBalance(wallet) {
     const normalized = normalizeWallet(wallet);
+    const variants = walletVariants(normalized);
 
-    const referrals = await prisma.referral.findMany({ where: { referredBy: normalized } });
+    const referrals = await prisma.referral.findMany({ where: { referredBy: { in: variants } } });
 
     const referralData = [];
     let totalEarnedNano = 0n;
@@ -32,8 +49,9 @@ async function computeBalance(wallet) {
     for (const ref of referrals) {
         const count = await prisma.mint.count({
             where: {
-                walletAddress: { in: [ref.wallet, ref.wallet.toUpperCase()] },
-                status: 'confirmed'
+                walletAddress: { in: walletVariants(ref.wallet) },
+                status: 'confirmed',
+                amountNano: { not: '0' } 
             }
         });
         const earnedNano = BigInt(count) * REWARD_PER_MINT_NANO;
@@ -48,12 +66,10 @@ async function computeBalance(wallet) {
     }
 
     const withdrawals = await prisma.withdrawal.findMany({
-        where: { wallet: normalized, status: 'sent' }
+        where: { wallet: { in: variants }, status: { in: ['sent', 'review'] } }
     });
     const withdrawnNano = withdrawals.reduce((sum, w) => sum + BigInt(w.amountNano), 0n);
-    const availableNano = totalEarnedNano > withdrawnNano
-        ? totalEarnedNano - withdrawnNano
-        : 0n;
+    const availableNano = totalEarnedNano > withdrawnNano ? totalEarnedNano - withdrawnNano : 0n;
 
     return { referralData, totalEarnedNano, withdrawnNano, availableNano };
 }
@@ -83,65 +99,61 @@ router.get('/me', async (req, res) => {
     }
 });
 
+const withdrawing = new Set();
+
 // POST /api/referral/withdraw
 router.post('/withdraw', async (req, res) => {
+    let lockKey;
     try {
         const { walletAddress } = req.body || {};
         if (!walletAddress) {
             return res.status(400).json({ ok: false, error: 'walletAddress_required' });
         }
 
-        // TON-address validation
         let normalized;
         try {
-            normalized = normalizeWallet(walletAddress);
-            const { Address } = require('@ton/core');
-            Address.parse(normalized); 
+            normalized = Address.parse(String(walletAddress).trim()).toRawString();
         } catch {
             return res.status(400).json({ ok: false, error: 'invalid_wallet_address' });
         }
- 
-        const existingPending = await prisma.withdrawal.findFirst({
-            where: { wallet: normalized, status: 'pending' }
+
+        if (withdrawing.has(normalized)) {
+            return res.status(429).json({ ok: false, error: 'withdrawal_in_progress' });
+        }
+        withdrawing.add(normalized);
+        lockKey = normalized;
+
+        const blocked = await prisma.withdrawal.findFirst({
+            where: { wallet: normalized, status: { in: ['pending', 'review'] } }
         });
-        if (existingPending) {
-            return res.status(429).json({
-                ok: false,
-                error: 'withdrawal_in_progress',
-                detail: 'A withdrawal is already being processed, try again in a minute'
-            });
+        if (blocked) {
+            return res.status(429).json({ ok: false, error: 'withdrawal_in_progress' });
         }
 
-        const { availableNano } = await computeBalance(walletAddress);
+        const { availableNano } = await computeBalance(normalized);
         if (availableNano <= 0n) {
             return res.status(400).json({ ok: false, error: 'nothing_to_withdraw' });
         }
 
-       
         const rec = await prisma.withdrawal.create({
             data: { wallet: normalized, amountNano: String(availableNano), status: 'pending' }
         });
 
         try {
-            const { sendTon } = require('../services/mintOnChain');
-            await sendTon({ toAddress: walletAddress, amountNano: availableNano });
-
-            await prisma.withdrawal.update({
-                where: { id: rec.id },
-                data: { status: 'sent' }
-            });
-
-            res.json({ ok: true, amountTon: Number(availableNano) / 1e9 });
+            await sendTon({ toAddress: normalized, amountNano: availableNano });
+            await prisma.withdrawal.update({ where: { id: rec.id }, data: { status: 'sent' } });
+            return res.json({ ok: true, amountTon: Number(availableNano) / 1e9 });
         } catch (e) {
-            await prisma.withdrawal.update({
-                where: { id: rec.id },
-                data: { status: 'failed' }
-            }).catch(() => {});
-            throw e;
+            console.error('sendTon error:', e);
+           
+            await prisma.withdrawal.update({ where: { id: rec.id }, data: { status: 'review' } }).catch(() => {});
+            return res.status(500).json({ ok: false, error: 'internal' });
         }
     } catch (e) {
         console.error('referral/withdraw error:', e);
-        res.status(500).json({ ok: false, error: 'internal' });
+        return res.status(500).json({ ok: false, error: 'internal' });
+    } finally {
+        if (lockKey) withdrawing.delete(lockKey);
     }
 });
 

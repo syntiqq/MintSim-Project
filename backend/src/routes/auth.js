@@ -11,7 +11,7 @@ router.post('/telegram', async (req, res) => {
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
         if (!botToken) {
-            return res.status(500).json({ ok: false, error: 'config', detail: 'TELEGRAM_BOT_TOKEN not set' });
+            return res.status(500).json({ ok: false, error: 'config' });
         }
         if (!initData) {
             return res.status(400).json({ ok: false, error: 'bad_request', detail: 'initData required' });

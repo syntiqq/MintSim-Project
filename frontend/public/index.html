@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@5.0.3/dist/tonconnect-ui.min.js"></script>
   <meta charset="UTF-8" />
   <title>MintSim — NFT Minting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/icon.png" type="image/png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/iosevka@5.2.6/index.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <script src="https://unpkg.com/@tonconnect/sdk/dist/tonconnect.min.js"></script>
-
   <style>
     /* MAIN PAGE */
   #page-main { display: flex; flex-direction: column; gap: 14px; }
@@ -738,7 +735,7 @@ async function mintNumber() {
     // backend order
     const orderRes = await fetch(`${BACKEND_URL}/api/mint/order`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-tg-id': getTgId() },
+      headers: {'Content-Type': 'application/json','x-tg-id': getTgId(),...(AUTH.token ? { Authorization: `Bearer ${AUTH.token}` } : {})},
       body: JSON.stringify({ walletAddress: wallet.address, ref: getRefFromUrl() })
     });
     const order = await orderRes.json();
@@ -810,9 +807,6 @@ async function mintNumber() {
         const data = await api(`/api/referral/me?wallet=${encodeURIComponent(wallet)}`, { method: 'GET' });
         document.getElementById('refReward').textContent = (data.rewardPerMint || 0.5) + ' GRAM';
         document.getElementById('refEarned').textContent = (data.totalAvailable || 0).toFixed(2) + ' GRAM';
-        if (data.totalAvailable > 0) {
-            document.getElementById('withdrawBtn').style.display = 'block';
-        }
         renderReferralList(data?.referrals || []);
     } catch {
         renderReferralList([]);

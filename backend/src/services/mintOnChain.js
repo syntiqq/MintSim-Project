@@ -29,12 +29,20 @@ async function adminWallet() {
         }
         const keys   = await mnemonicToPrivateKey(words);
         const wallet = WalletContractV5R1.create({ publicKey: keys.publicKey, workchain: 0 });
-        console.log('🔑 Admin wallet key:', wallet.address.toString());
- //       console.log('🔑 Public key (hex):', keys.publicKey.toString('hex'));
+        console.log('🔑 Admin wallet:', wallet.address.toString());
         _walletData = { keys, wallet };
     }
     return _walletData;
 }
+
+let _lock = Promise.resolve();
+function withWalletLock(fn) {
+    const run = _lock.then(fn);
+    _lock = run.catch(() => {});
+    return run;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function offchainContentCell(uri) {
     return beginCell().storeUint(0x01, 8).storeStringTail(uri).endCell();
@@ -47,10 +55,15 @@ async function getNextItemIndex() {
     return res.stack.readBigNumber();
 }
 
-async function mintNft({ ownerAddress, metaUri }) {
+async function _mintNft({ ownerAddress, metaUri }) {
     const { keys, wallet } = await adminWallet();
     const tonClient = client();
     const opened    = tonClient.open(wallet);
+
+    const balance = await tonClient.getBalance(wallet.address);
+    if (balance < toNano('0.2')) {
+        throw new Error('Admin wallet balance too low for mint');
+    }
 
     const collectionAddr = Address.parse(process.env.GETGEMS_COLLECTION);
     const index  = await getNextItemIndex();
@@ -78,7 +91,7 @@ async function mintNft({ ownerAddress, metaUri }) {
 
     let cur = seqno, attempts = 0;
     while (cur === seqno && attempts < 25) {
-        await new Promise(r => setTimeout(r, 2000));
+        await sleep(2000);
         cur = await opened.getSeqno();
         attempts++;
     }
@@ -89,7 +102,7 @@ async function mintNft({ ownerAddress, metaUri }) {
     let indexAfter = await getNextItemIndex();
     let checkAttempts = 0;
     while (indexAfter <= index && checkAttempts < 20) {
-        await new Promise(r => setTimeout(r, 3000));
+        await sleep(3000);
         indexAfter = await getNextItemIndex();
         checkAttempts++;
     }
@@ -105,11 +118,18 @@ async function mintNft({ ownerAddress, metaUri }) {
     return { index, nftAddress: nftAddress.toString() };
 }
 
-//referral
-async function sendTon({ toAddress, amountNano }) {
+// referral
+async function _sendTon({ toAddress, amountNano }) {
     const { keys, wallet } = await adminWallet();
     const tonClient = client();
     const opened    = tonClient.open(wallet);
+
+    const amount = BigInt(amountNano);
+
+    const balance = await tonClient.getBalance(wallet.address);
+    if (balance < amount + toNano('0.05')) {
+        throw new Error('Admin wallet balance too low for withdrawal');
+    }
 
     const seqno = await opened.getSeqno();
 
@@ -117,15 +137,16 @@ async function sendTon({ toAddress, amountNano }) {
         seqno,
         secretKey: keys.secretKey,
         messages: [internal({
-            to:    Address.parse(toAddress),
-            value: BigInt(amountNano),
-            body:  beginCell().storeUint(0, 32).storeStringTail('MintSim referral reward').endCell(),
+            to:     Address.parse(toAddress),
+            value:  amount,
+            bounce: false,  
+            body:   beginCell().storeUint(0, 32).storeStringTail('MintSim referral reward').endCell(),
         })],
     });
 
     let cur = seqno, attempts = 0;
     while (cur === seqno && attempts < 25) {
-        await new Promise(r => setTimeout(r, 2000));
+        await sleep(2000);
         cur = await opened.getSeqno();
         attempts++;
     }
@@ -135,5 +156,8 @@ async function sendTon({ toAddress, amountNano }) {
 
     return { ok: true };
 }
+
+const mintNft = (args) => withWalletLock(() => _mintNft(args));
+const sendTon = (args) => withWalletLock(() => _sendTon(args));
 
 module.exports = { mintNft, getNextItemIndex, sendTon };

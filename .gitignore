@@ -7,3 +7,8 @@ dist/
 build/
 .vercel/
 notes/
+.env.*
+*.db
+*.db-journal
+.vercel
+admin.html
